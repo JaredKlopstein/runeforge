@@ -111,6 +111,10 @@ Title → **Tutorial** (or `#tutorial`). `startTutorial()` starts a Squire game 
 - Rune Stone is placed on the grass tile nearest the center that is reachable from the player's TC with at least 5 open neighbours; the AI relic squad gets `relicGuard` + hold stance and is skipped by straggler and siege logic.
 - Frame loop caps simulated time at 1.2× game speed per real second and stops simulating 90s after game over. Defeat/victory clears the autosave. New units start with `stance:'aggro'`.
 
+## Resource dropdowns
+
+Top-bar pills with `data-res` (wood/stone/ore/food/pop/age/arms) open `#resdrop` on click (`toggleResDrop`, content from `resDropHtml`, refreshed every second while open, closed by outside mousedown or Esc). Income comes from `G.hist`, a per-second stock sample ring (90 entries) pushed in `update`; `incomePerMin(k)` reads the 30s delta. Actions are `data-ract` buttons routed through `resDropAction` and only call existing commands (gather/build placement/upgrade/smith). Hover tooltips are suppressed on the open pill.
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).

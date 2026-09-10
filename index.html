@@ -62,6 +62,15 @@ h3{margin:0 0 4px;font-family:var(--font-ui);font-size:16px;color:var(--gold2);f
 kbd{background:#3a2f1c;border:1px solid #8a6d3b;border-radius:3px;padding:0 5px;color:#f3d98a}
 #msg{position:absolute;left:50%;top:84px;transform:translateX(-50%);z-index:6;pointer-events:none;text-align:center;font-size:13px}
 #msg div{background:rgba(18,14,8,.9);border:1px solid #9c7b45;padding:4px 14px;margin-bottom:4px;border-radius:4px;color:#f3d98a;box-shadow:0 2px 8px rgba(0,0,0,.6)}
+.res[data-res]{cursor:pointer}.res[data-res]:hover{border-color:var(--gold2)}.res[data-res].open{border-color:var(--gold2);box-shadow:0 0 8px rgba(226,184,92,.35)}
+#resdrop{position:absolute;top:46px;left:12px;width:300px;z-index:8;background:linear-gradient(rgba(38,30,16,.97),rgba(20,14,8,.97));border:1px solid var(--gold);border-radius:5px;padding:9px 12px;font-size:12px;line-height:1.4;box-shadow:0 6px 18px rgba(0,0,0,.65);display:none}
+#resdrop.show{display:block}
+#resdrop h4{margin:0 0 5px;font-family:var(--font-ui);font-size:15px;color:var(--gold2)}
+#resdrop .kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+#resdrop .kv span:first-child{color:#a8987a}
+#resdrop .ok{color:#9fe27a}#resdrop .bad{color:#ff8a7a}#resdrop .warn{color:#f0b060}
+#resdrop .acts{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+#resdrop .acts button{padding:3px 8px;font-size:11px}
 #tutor{position:absolute;left:12px;top:52px;width:300px;z-index:6;background:linear-gradient(rgba(38,30,16,.95),rgba(20,14,8,.95));border:1px solid var(--gold);border-radius:5px;padding:9px 12px;font-size:12.5px;line-height:1.4;box-shadow:0 4px 16px rgba(0,0,0,.6);display:none}
 #tutor.show{display:block}
 #tutor .tt-head{display:flex;justify-content:space-between;align-items:center;color:var(--gold2);font-size:11px;letter-spacing:.08em;margin-bottom:4px}
@@ -114,13 +123,13 @@ label.chk{display:flex;gap:8px;align-items:center;cursor:pointer}
 </div>
 <div id="topbar">
  <span id="word">RUNEFORGE</span>
- <div class="res" data-tip="Wood — from trees (Woodcutting)"><canvas class="ico" data-ico="wood"></canvas><span id="r-wood">0</span></div>
- <div class="res" data-tip="Stone — from rocks (Mining)"><canvas class="ico" data-ico="stone"></canvas><span id="r-stone">0</span></div>
- <div class="res" data-tip="Ore — from ore veins (Mining). Smith it at a Forge."><canvas class="ico" data-ico="ore"></canvas><span id="r-ore">0</span></div>
- <div class="res" data-tip="Food — from fish (Fishing). Trains units."><canvas class="ico" data-ico="food"></canvas><span id="r-food">0</span></div>
- <div class="res" data-tip="Population / cap. Build Houses for more."><canvas class="ico" data-ico="pop"></canvas><span id="r-pop">0/0</span></div>
- <div class="res" style="min-width:110px" data-tip="Current age. Advance at the Town Center."><canvas class="ico" id="agecol" data-ico="age"></canvas><span id="r-age">Bronze Age</span></div>
- <div class="res" data-tip="Arms forged by Smithing. Each +0.5 max hit for all your units."><canvas class="ico" data-ico="arms"></canvas><span id="r-arms">Arms 0</span></div>
+ <div class="res" data-res="wood" data-tip="Wood — from trees (Woodcutting). Click for details."><canvas class="ico" data-ico="wood"></canvas><span id="r-wood">0</span></div>
+ <div class="res" data-res="stone" data-tip="Stone — from rocks (Mining). Click for details."><canvas class="ico" data-ico="stone"></canvas><span id="r-stone">0</span></div>
+ <div class="res" data-res="ore" data-tip="Ore — from ore veins (Mining). Smith it at a Forge. Click for details."><canvas class="ico" data-ico="ore"></canvas><span id="r-ore">0</span></div>
+ <div class="res" data-res="food" data-tip="Food — from fish and farms. Trains units. Click for details."><canvas class="ico" data-ico="food"></canvas><span id="r-food">0</span></div>
+ <div class="res" data-res="pop" data-tip="Population / cap. Click for details."><canvas class="ico" data-ico="pop"></canvas><span id="r-pop">0/0</span></div>
+ <div class="res" data-res="age" style="min-width:110px" data-tip="Current age. Click for the next age's requirements."><canvas class="ico" id="agecol" data-ico="age"></canvas><span id="r-age">Bronze Age</span></div>
+ <div class="res" data-res="arms" data-tip="Arms forged by Smithing. Each +0.5 max hit for all your units. Click for details."><canvas class="ico" data-ico="arms"></canvas><span id="r-arms">Arms 0</span></div>
  <div class="res" id="r-relic" data-tip="The Rune Stone at the map center. Hold it with units (no enemies nearby) for a food trickle and +12% XP." style="display:none;color:var(--rune)">✦ Rune Stone</div>
  <div class="sp"></div>
  <span id="r-idle" class="dim" data-tip="Idle villagers. Press . to cycle them." style="cursor:pointer">Idle 0</span>
@@ -134,6 +143,7 @@ label.chk{display:flex;gap:8px;align-items:center;cursor:pointer}
 </div>
 <div id="msg"></div>
 <div id="mode"></div>
+<div id="resdrop"></div>
 <div id="tutor"><div class="tt-head"><span id="tt-prog">Tutorial 1/12</span><span class="tt-btns"><button id="tt-skip" data-tip="Skip this objective">Skip</button><button id="tt-exit" data-tip="Leave the tutorial and keep playing">Exit</button></span></div><div id="tt-title">Objective</div><div id="tt-text"></div></div>
 <div id="alert"><b>⚠ Under attack!</b> <span id="alert-where"></span> — press <kbd>Space</kbd> to jump there</div>
 <div id="panel">
@@ -1018,7 +1028,7 @@ function hideOvs(){for(const id of ['lobby','settings','tut','menu','skills','en
 const SAVE_KEY=(()=>{try{const t=new URLSearchParams(location.search).get('tester')||new URLSearchParams(location.search).get('profile');return 'runeforge_save'+(t?'_'+t.replace(/[^a-z0-9_-]/gi,''):'')}catch(e){return 'runeforge_save'}})();
 function hasSave(){try{return !!localStorage.getItem(SAVE_KEY)}catch(e){return false}}
 function refreshContinue(){const b=$('b-continue');if(!b)return;b.disabled=!hasSave();let label='Continue';try{const m=JSON.parse(localStorage.getItem(SAVE_KEY+'_meta')||'null');if(m&&hasSave()){const t=Math.floor(m.time||0);label='Continue · '+(DIFF[m.diff||0]||DIFF[0]).name+' · '+(m.seed||'')+' · '+Math.floor(t/60)+':'+String(t%60).padStart(2,'0')+' · '+AGES[m.age||0].name}}catch(e){}b.textContent=label}
-function showTitle(){$('tutor').classList.remove('show');UI.screen='title';UI.ingame=false;document.body.classList.remove('play');hideOvs();$('bootui').classList.add('title');$('bootui').style.display='flex';refreshContinue();if(G)G.paused=true;MUS.start()}
+function showTitle(){$('tutor').classList.remove('show');toggleResDrop(null);UI.screen='title';UI.ingame=false;document.body.classList.remove('play');hideOvs();$('bootui').classList.add('title');$('bootui').style.display='flex';refreshContinue();if(G)G.paused=true;MUS.start()}
 function showLobby(){UI.screen='lobby';UI.ingame=false;document.body.classList.remove('play');hideOvs();$('bootui').style.display='none';$('lobby').classList.add('show');$('lobseed').value=$('lobseed').value||'rune';paintDiff();paintLobbyMap($('lobseed').value||'rune');if(G)G.paused=true;MUS.start()}
 function showSettings(from){UI.settingsFrom=from||UI.screen;hideOvs();if(!UI.ingame){$('bootui').style.display='none';document.body.classList.remove('play')} $('settings').classList.add('show');syncSettings();UI.screen='settings'}
 function closeSettings(){if(UI.settingsFrom==='pause'){hideOvs();$('menu').classList.add('show');UI.screen='pause'}else showTitle()}
@@ -1063,7 +1073,7 @@ function bindInput(){
  window.addEventListener('mousemove',e=>{UI.mx=e.clientX;UI.my=e.clientY;UI.inWin=true;const [wx,wy]=s2w(e.clientX,e.clientY);updateGhost(wx,wy);
   if(UI.drag&&!UI.dragging&&Math.hypot(e.clientX-UI.drag.x,e.clientY-UI.drag.y)>4)UI.dragging=true;
   const tip=$('tip');let txt=null;const el=e.target.closest?e.target.closest('[data-tip]'):null;if(el)txt=el.getAttribute('data-tip');else if(e.target===cv&&e.clientY>34&&e.clientY<innerHeight-196&&G)txt=tooltipFor(wx,wy);
-  UI.tipSrc=el?'el':(txt?'canvas':null);if(txt){tip.style.display='block';tip.textContent=txt;tip.style.left=Math.min(innerWidth-280,e.clientX+14)+'px';tip.style.top=(e.clientY>innerHeight-120?e.clientY-70:e.clientY+16)+'px'}else tip.style.display='none'});
+  UI.tipSrc=el?'el':(txt?'canvas':null);if(UI.resDrop&&el&&el.closest('.res[data-res]'))txt=null;if(txt){tip.style.display='block';tip.textContent=txt;tip.style.left=Math.min(innerWidth-280,e.clientX+14)+'px';tip.style.top=(e.clientY>innerHeight-120?e.clientY-70:e.clientY+16)+'px'}else tip.style.display='none'});
  window.addEventListener('mouseup',e=>{if(!UI.ingame||!G||e.button!==0||!UI.drag)return;const d=UI.drag;UI.drag=null;
   if(UI.dragging){const [ax,ay]=[d.wx,d.wy],[bx,by]=s2w(e.clientX,e.clientY);const x0=Math.min(ax,bx),x1=Math.max(ax,bx),y0=Math.min(ay,by),y1=Math.max(ay,by);const ids=[];for(const u of G.units)if(!u.dead&&!u.inside&&u.team===0&&u.x+9>=x0&&u.x-9<=x1&&u.y+9>=y0&&u.y-14<=y1)ids.push(u.id);
    if(ids.length)setSel(ids,e.shiftKey);else if(!e.shiftKey)setSel([],false)}
@@ -1073,7 +1083,7 @@ function bindInput(){
  cv.addEventListener('wheel',e=>{if(!UI.ingame)return;e.preventDefault();const [wx,wy]=s2w(e.clientX,e.clientY);let dy=e.deltaY;if(e.deltaMode===1)dy*=16;else if(e.deltaMode===2)dy*=innerHeight;const mag=Math.min(0.055,0.0007*Math.abs(dy||16));const nz=clamp(cam.z*(dy<0?1+mag:1/(1+mag)),0.4,2.2);cam.z=nz;cam.x=wx-e.clientX/nz;cam.y=wy-e.clientY/nz;clampCam()},{passive:false});
  document.addEventListener('mouseleave',()=>{UI.inWin=false});document.addEventListener('mouseenter',()=>{UI.inWin=true});
  window.addEventListener('keydown',e=>{UI.shift=e.shiftKey;const k=e.key.toLowerCase();if(UI.ingame&&!e.repeat&&!UI.keys[k]&&(k==='w'||k==='a'||k==='s'||k==='d')&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){const n=64/cam.z;if(k==='w')cam.y-=n;if(k==='s')cam.y+=n;if(k==='a')cam.x-=n;if(k==='d')cam.x+=n;clampCam()}UI.keys[k]=true;if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
-  if(k==='escape'){if(UI.placing||UI.mode){UI.placing=null;UI.mode=null;updateMode();return}if(performance.now()-(UI.placeEsc||0)<900){UI.placeEsc=0;return}
+  if(k==='escape'){if(UI.resDrop){toggleResDrop(null);return}if(UI.placing||UI.mode){UI.placing=null;UI.mode=null;updateMode();return}if(performance.now()-(UI.placeEsc||0)<900){UI.placeEsc=0;return}
    if(UI.screen==='skills'){toggleSkills();return}if(UI.screen==='howto'){closeHowto();return}if(UI.screen==='settings'){closeSettings();return}if(UI.screen==='lobby'){showTitle();return}if(UI.screen==='pause'){toggleMenu();return}if(UI.screen==='game'){toggleMenu();return}return}
   if(!UI.ingame||$('menu').classList.contains('show')||$('tut').classList.contains('show')||$('settings').classList.contains('show'))return;
   if(k>='1'&&k<='5'){if(e.ctrlKey||e.metaKey){UI.groups[k]=UI.sel.slice();showMsg('Group '+k+' set');e.preventDefault()}else{const g=(UI.groups[k]||[]).filter(id=>{const en=G.byId.get(id);return en&&!en.dead});if(g.length){setSel(g,e.shiftKey);if(UI.lastGroupKey===k&&performance.now()-UI.lastGroupT<400){const u=G.byId.get(g[0]);centerOn(u.x,u.y)}UI.lastGroupKey=k;UI.lastGroupT=performance.now()}}return}
@@ -1092,7 +1102,7 @@ function bindInput(){
  $('sel').addEventListener('click',e=>{const d=e.target.closest('[data-id]');if(d)setSel([+d.getAttribute('data-id')],false)});
  const mmHandler=e=>{const r=$('mm').getBoundingClientRect();const tx=(e.clientX-r.left)/180*N,ty=(e.clientY-r.top)/180*N;if(e.buttons&2||e.button===2){if(UI.mode==='amove'){issueCommand(tx*TS,ty*TS,true);UI.mode=null;updateMode()}else issueCommand(tx*TS,ty*TS,false)}else if(e.buttons&1||e.button===0){if(UI.mode==='amove'&&e.type==='mousedown'){issueCommand(tx*TS,ty*TS,true);UI.mode=null;updateMode();return}centerOn(tx*TS,ty*TS)}};
  $('mm').addEventListener('mousedown',mmHandler);$('mm').addEventListener('mousemove',e=>{if(e.buttons&1)mmHandler(e)});$('mm').addEventListener('contextmenu',e=>e.preventDefault());
- $('b-speed').onclick=()=>{if(!G)return;G.speed=G.speed>=3?1:G.speed+1;refreshPanel()};$('b-pause').onclick=()=>{if(!G)return;G.paused=!G.paused;refreshPanel()};$('b-help').onclick=()=>openHowto(true);$('b-skills').onclick=toggleSkills;$('skills-close').onclick=toggleSkills;$('b-menu').onclick=toggleMenu;
+ $('b-speed').onclick=()=>{if(!G)return;G.speed=G.speed>=3?1:G.speed+1;refreshPanel()};$('b-pause').onclick=()=>{if(!G)return;G.paused=!G.paused;refreshPanel()};$('b-help').onclick=()=>openHowto(true);document.querySelectorAll('.res[data-res]').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();toggleResDrop(el.dataset.res)})});$('resdrop').addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-ract]');if(b)resDropAction(b.dataset.ract)});document.addEventListener('mousedown',e=>{if(UI.resDrop&&!e.target.closest('#resdrop')&&!e.target.closest('.res[data-res]'))toggleResDrop(null)});$('b-skills').onclick=toggleSkills;$('skills-close').onclick=toggleSkills;$('b-menu').onclick=toggleMenu;
  if($('r-idle'))$('r-idle').onclick=cycleIdle;
  $('tut-close').onclick=closeHowto;
  $('m-resume').onclick=toggleMenu;
@@ -1115,6 +1125,34 @@ function skillsHtml(){const desc={wc:'Each level +3% chop speed. Carry cap +2 pe
   const lv=Object.keys(UNLOCKS[sk]).map(Number).sort((a,b)=>a-b);const next=lv.find(L=>L>bl);const have=lv.filter(L=>L<=bl).map(L=>UNLOCKS[sk][L]);
   h+='<div class="n">'+SKILL_NAME[sk]+'</div><div>Best <b>'+bl+'</b>'+(best?' ('+UNIT_DEF[best.type].name+')':'')+' · avg '+avg+' · units at 10/20/30: '+c10+'/'+c20+'/'+c30+'<br><span class="dim">'+desc[sk]+'</span><br>'+(have.length?'<span class="u">Unlocked:</span> '+have.join(', ')+'<br>':'')+(next?'<span class="dim">Next at '+next+':</span> '+UNLOCKS[sk][next]:'<span class="u">All unlocks earned</span>')+'</div>'}
  h+='</div><p class="dim" style="margin-top:10px">Top-6 skill average (age gate): '+avgSkill(0).toFixed(1)+' · Arms cap '+armsCap(0)+' · Buildings can be upgraded from their panel (U) and repaired by right-clicking them with villagers.</p>';return h}
+function incomePerMin(k){const h=G.hist||[];if(h.length<3)return null;const now=h[h.length-1];let old=h[0];for(const x of h){if(now.t-x.t<=30)break;old=x}const dt=now.t-old.t;if(dt<5)return null;return (now[k]-old[k])/dt*60}
+function fmtT(sec){sec=Math.max(0,Math.round(sec));return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
+function resDropHtml(k){const team=G.teams[0],res=team.res;const vils=G.units.filter(u=>u.team===0&&!u.dead&&u.type==='villager');const btn=(a,l,tip)=>'<button data-ract="'+a+'" data-tip="'+tip.replace(/"/g,'&quot;')+'">'+l+'</button>';const inc=(k)=>{const v=incomePerMin(k);return v===null?'<span class="dim">measuring…</span>':'<span class="'+(v<0?'bad':v>0?'ok':'')+'">'+(v>0?'+':'')+Math.round(v)+' / min</span>'};
+ if(k==='wood'||k==='stone'||k==='ore'||k==='food'){const sk=NODE_SKILL[k];const workers=vils.filter(u=>u.task&&((u.task.kind==='gather'&&u.task.node>=0&&G.nodes[u.task.node].type===k)||(k==='food'&&u.task.kind==='farm')));const tiers={};for(const u of workers){const n=u.task.kind==='farm'?'Farm':NODE_DEF[k][G.nodes[u.task.node].tier].name;tiers[n]=(tiers[n]||0)+1}
+  let soon='';{const per={};for(const u of workers){if(u.task.kind!=='gather')continue;const n=G.nodes[u.task.node];per[n.i]=per[n.i]||{n,w:0,rate:0};per[n.i].w++;per[n.i].rate+=NODE_DEF[k][n.tier].yield*skillMult(u.lv[sk])/GATHER_T}let worst=null;for(const id in per){const e=per[id];const t=e.n.amt/Math.max(0.01,e.rate);if(!worst||t<worst.t)worst={t,e}}if(worst)soon=NODE_DEF[k][worst.e.n.tier].name+' ('+worst.e.w+' working) empties in ~'+fmtT(worst.t)}
+  let best=1;for(const u of vils)if(u.lv[sk]>best)best=u.lv[sk];let bestTier=0;for(let i=0;i<NODE_DEF[k].length;i++)if(NODE_DEF[k][i].lvl<=best)bestTier=i;const nextT=NODE_DEF[k][bestTier+1];
+  let need='';if(team.age<2){const a=AGES[team.age+1];if(a.cost[k]&&res[k]<a.cost[k])need=a.name+' Age needs '+(a.cost[k]-Math.floor(res[k]))+' more'}
+  let h='<h4>'+SKILL_NAME[sk]+' · '+k.charAt(0).toUpperCase()+k.slice(1)+'</h4><div class="kv"><span>Stock</span><span>'+Math.floor(res[k])+'</span><span>Income</span>'+inc(k)+'<span>Gatherers</span><span>'+(workers.length?Object.entries(tiers).map(([n,c])=>c+' on '+n).join(', '):'<span class="warn">none</span>')+'</span><span>Best skill</span><span>'+best+' ('+NODE_DEF[k][bestTier].name+(nextT?', '+nextT.name+' at '+nextT.lvl:'')+')</span>'+(soon?'<span>Running out</span><span class="warn">'+soon+'</span>':'')+(need?'<span>Needed</span><span class="warn">'+need+'</span>':'')+'</div>';
+  h+='<div class="acts">'+btn('send:'+k,'Send a villager','Send the nearest idle villager (or one from your richest resource) to gather '+k)+btn('goto:'+k,'Find best node','Jump the camera to the best '+k+' node your top gatherer can use')+(k==='food'?btn('build:farm','Place Farm','Place a Farm (J) with the nearest villager'):btn('build:store','Place Storehouse','Place a Storehouse (E) with the nearest villager to shorten hauls'))+'</div>';return h}
+ if(k==='pop'){const cap=popCap(0),used=G.popUsed[0];let queued=0;for(const b of G.blds)if(b.team===0&&!b.dead)queued+=b.queue.length;const houses=G.blds.filter(b=>b.team===0&&!b.dead&&b.type==='house');const tc=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);
+  let h='<h4>Population</h4><div class="kv"><span>Used / cap</span><span class="'+(used>=cap?'bad':used>=cap-2?'warn':'')+'">'+used+' / '+cap+(cap>=POP_MAX?' (max)':'')+'</span><span>Queued</span><span>'+queued+'</span><span>Houses</span><span>'+(houses.length?houses.map(b=>bname(b)).join(', '):'none')+'</span><span>Town Center</span><span>'+(tc?bname(tc)+' (+'+bdef(tc).pop+')':'—')+'</span></div>';
+  h+='<div class="acts">'+btn('build:house','Place House','Place a House (H) with the nearest villager: +5 pop')+(houses.some(b=>b.tier<2&&!b.upg&&b.built)?btn('upgrade:house','Upgrade a House','Start the cheapest House upgrade (Cottage +8, Manor +12)'):'')+'</div>';return h}
+ if(k==='age'){let h='<h4>'+AGES[team.age].name+' Age</h4>';if(team.adv>0)h+='<div class="ok">Advancing… '+Math.ceil(team.adv)+'s</div>';else if(team.age>=2)h+='<div class="ok">Rune Age reached — the final age.</div>';else{const a=AGES[team.age+1];const avg=avgSkill(0);h+='<div class="kv">';for(const r in a.cost){const ok=res[r]>=a.cost[r];h+='<span>'+r+'</span><span class="'+(ok?'ok':'bad')+'">'+Math.floor(res[r])+' / '+a.cost[r]+(ok?' ✓':' (need '+(a.cost[r]-Math.floor(res[r]))+')')+'</span>'}const okS=avg>=a.minAvg;h+='<span>Top-6 skill</span><span class="'+(okS?'ok':'bad')+'">'+avg.toFixed(1)+' / '+a.minAvg+(okS?' ✓':'')+'</span></div><div class="dim" style="margin-top:4px">Unlocks: '+(team.age===0?'Rangers, Rams, Towers, Forge':'Knights')+' and a gear upgrade for every unit.</div>'}
+  h+='<div class="acts">'+btn('goto:tc','Go to Town Center','Select the Town Center, where Advance lives')+'</div>';return h}
+ if(k==='arms'){const cap=armsCap(0);const forge=G.blds.find(b=>b.team===0&&!b.dead&&b.type==='forge'&&b.built);const smiths=vils.filter(u=>u.task&&u.task.kind==='smith');let bestSm=1;for(const u of vils)if(u.lv.sm>bestSm)bestSm=u.lv.sm;
+  let h='<h4>Arms '+team.arms+' / '+cap+'</h4><div class="kv"><span>Effect</span><span>+'+(team.arms*0.5).toFixed(1)+' max hit for every unit</span><span>Cap from</span><span>4 base, +'+(team.age*4)+' age'+(forge?', +'+(bdef(forge).arms||0)+' '+bname(forge):'')+', +'+Math.floor(bestSm/10)+' Smithing</span><span>Forge</span><span>'+(forge?bname(forge):'<span class="warn">none (Iron Age building)</span>')+'</span><span>Smithing</span><span>'+(smiths.length?smiths.length+' working':'nobody')+' · best skill '+bestSm+' · costs 4 ore each</span></div>';
+  h+='<div class="acts">'+(forge?btn('smith','Assign a smith','Send the nearest villager to the Forge'):(team.age>=1?btn('build:forge','Place Forge','Place a Forge (G) with the nearest villager'):''))+'</div>';return h}
+ return ''}
+function toggleResDrop(k){const el=$('resdrop');if(UI.resDrop===k||!k){UI.resDrop=null;el.classList.remove('show');document.querySelectorAll('.res.open').forEach(e=>e.classList.remove('open'));return}UI.resDrop=k;document.querySelectorAll('.res.open').forEach(e=>e.classList.remove('open'));const pill=document.querySelector('.res[data-res="'+k+'"]');if(pill){pill.classList.add('open');const r=pill.getBoundingClientRect();el.style.left=Math.min(innerWidth-316,Math.max(4,r.left))+'px'}el.innerHTML=resDropHtml(k);el.classList.add('show');$('tip').style.display='none'}
+function refreshResDrop(){if(!UI.resDrop||!G)return;const el=$('resdrop');if(!el.classList.contains('show'))return;el.innerHTML=resDropHtml(UI.resDrop)}
+function nearestVillager(x,y,pref){let best=null,bd=1e18;for(const u of G.units){if(u.team!==0||u.dead||u.inside||u.type!=='villager')continue;const busy=u.task&&u.task.kind!=='gather'&&u.task.kind!=='farm'?1:0;if(pref==='idle'&&u.task)continue;const d=Math.hypot(u.x-x,u.y-y)+busy*4000+(u.task?600:0);if(d<bd){bd=d;best=u}}return best}
+function resDropAction(a){const [op,arg]=a.split(':');const tc=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);const [tx,ty]=tc?bldCenter(tc):[0,0];
+ if(op==='send'){let u=nearestVillager(tx,ty,'idle');if(!u){let rich=null;for(const r of ['wood','stone','ore','food'])if(r!==arg&&(!rich||G.teams[0].res[r]>G.teams[0].res[rich]))rich=r;u=G.units.find(v=>v.team===0&&!v.dead&&!v.inside&&v.type==='villager'&&v.task&&v.task.kind==='gather'&&v.task.node>=0&&G.nodes[v.task.node].type===rich)}if(!u){showMsg('No villager free');return}const n=findNode(arg,u.x,u.y,u.lv[NODE_SKILL[arg]],95,650,4);if(!n){showMsg('No '+arg+' node your villagers can use');return}dropAuto([u]);u.task={kind:'gather',node:n.i,haul:false};u.orders=null;u.path=null;u.flow=null;setSel([u.id],false);showMsg('Villager sent to '+NODE_DEF[arg][n.tier].name)}
+ else if(op==='goto'){if(arg==='tc'){if(tc){setSel([tc.id],false);centerOn(tx,ty)}return}let best=1;for(const u of G.units)if(u.team===0&&!u.dead&&u.type==='villager'&&u.lv[NODE_SKILL[arg]]>best)best=u.lv[NODE_SKILL[arg]];const n=findNode(arg,tx,ty,best,95,900);if(!n){showMsg('No reachable '+arg+' node found');return}centerOn(n.x*TS+16,n.y*TS+16);showMsg(NODE_DEF[arg][n.tier].name+' — '+n.amt+' left')}
+ else if(op==='build'){const u=nearestVillager(tx,ty);if(!u){showMsg('No villager available');return}setSel([u.id],false);hotkeyBuild(arg);toggleResDrop(null);return}
+ else if(op==='upgrade'){const hs=G.blds.filter(b=>b.team===0&&!b.dead&&b.type==='house'&&b.built&&b.tier<2&&!b.upg).sort((a,b)=>a.tier-b.tier);if(!hs.length){showMsg('No House to upgrade');return}setSel([hs[0].id],false);doAction('upgrade');centerOn(...bldCenter(hs[0]))}
+ else if(op==='smith'){const forge=G.blds.find(b=>b.team===0&&!b.dead&&b.type==='forge'&&b.built);const u=forge&&nearestVillager(...bldCenter(forge));if(!u){showMsg('No villager available');return}dropAuto([u]);u.task={kind:'smith',bld:forge.id};u.orders=null;u.path=null;u.flow=null;setSel([u.id],false);showMsg('Villager sent to smith')}
+ refreshResDrop()}
 function toggleSkills(){if(!G)return;const m=$('skills');if(m.classList.contains('show')){m.classList.remove('show');UI.screen='game'}else{if($('menu').classList.contains('show')||$('tut').classList.contains('show'))return;$('skills-body').innerHTML=skillsHtml();m.classList.add('show');UI.screen='skills'}}
 function toggleMenu(){if(!UI.ingame||!G)return;const m=$('menu');if(m.classList.contains('show')){m.classList.remove('show');if(!G.over)G.paused=false;UI.screen='game'}else{hideOvs();m.classList.add('show');G.paused=true;UI.screen='pause';$('m-note').textContent='The war waits. Save a copy, load one, or resign to the title.'}refreshPanel()}
 function centerOn(x,y){cam.x=x-cv.width/cam.z/2;cam.y=y-(cv.height-160)/cam.z/2;clampCam()}
@@ -1141,7 +1179,7 @@ function endGame(kind){if(G.over)return;G.over=kind;G.overAt=G.time;const m=Math
  const st=G.stats||{};G.finalStats={killed:st.killed||0,lost:st.lost||0,built:st.built||0};const stats=' Time '+m+':'+String(s).padStart(2,'0')+' · Age: '+AGES[G.teams[0].age].name+' · Avg skill '+avgSkill(0).toFixed(1)+' · Units '+popUsed(0)+' · Kills '+ (st.killed||0)+' · Lost '+(st.lost||0)+' · Built '+(st.built||0);
  $('end-text').textContent=(kind==='win'?'The enemy Town Center lies in ruins.':'Your Town Center has fallen.')+stats;$('end').classList.add('show');
  if(kind==='win'){SND.play(523,0.3,'triangle',0.06);setTimeout(()=>SND.play(659,0.3,'triangle',0.06),200);setTimeout(()=>SND.play(784,0.5,'triangle',0.06),400)}else{SND.play(200,0.6,'sawtooth',0.06,-120)}}
-function update(dt){G.time+=dt;PC.budget=12;SND.n=0;SH.build();G.popUsed=[popUsed(0),popUsed(1)];if(G.tutorial)tutorTick(dt);
+function update(dt){G.time+=dt;PC.budget=12;SND.n=0;SH.build();G.popUsed=[popUsed(0),popUsed(1)];if(G.tutorial)tutorTick(dt);if(!G.hist)G.hist=[];if(!G.hist.length||G.time-G.hist[G.hist.length-1].t>=1){const r=G.teams[0].res;G.hist.push({t:G.time,wood:r.wood,stone:r.stone,ore:r.ore,food:r.food});if(G.hist.length>90)G.hist.shift()}
  for(let t=0;t<2;t++){const team=G.teams[t];if(team.adv>0){team.adv-=dt;if(team.adv<=0){team.adv=0;team.age++;UI.lastSelKey='';if(t===0){showMsg('Welcome to the '+AGES[team.age].name+' Age! Gear upgraded for every unit.');SND.play(392,0.2,'triangle',0.06);setTimeout(()=>SND.play(587,0.4,'triangle',0.06),180)}else showMsg('The enemy has reached the '+AGES[team.age].name+' Age')}}}
  for(const b of G.blds)updateBld(b,dt);
  for(const u of G.units)if(!u.dead)updateUnit(u,dt);
@@ -1179,7 +1217,7 @@ function frame(now){rafPending=false;lastFrameAt=now;if(!(BG&&document.hidden))s
  if(!UI.ingame){try{renderBoot(now)}catch(e){console.error(e)}return}
  if(G){const t0=performance.now();if(!G.simWin||now-G.simWin>1000){G.simWin=now;G.simUsed=0}
   try{updateCamera(dt);if(!G.paused&&!(G.over&&G.time-(G.overAt||0)>90)){const allow=Math.max(0,(G.speed||1)*1.2-(G.simUsed||0));if(allow>0){const steps=Math.min(G.speed,Math.ceil(allow/dt));for(let i=0;i<steps;i++)update(dt);G.simUsed=(G.simUsed||0)+dt*steps}}}catch(e){console.error(e)}
-  UI.panelT-=dt;G.refreshT-=dt;if(G.refreshT<=0){G.refreshT=0.2;try{refreshPanel();refreshTip()}catch(e){console.error(e)}}
+  UI.panelT-=dt;G.refreshT-=dt;if(G.refreshT<=0){G.refreshT=0.2;try{refreshPanel();refreshTip();if(UI.resDrop&&(G.dropT=(G.dropT||0)+1)%5===0)refreshResDrop()}catch(e){console.error(e)}}
   ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;try{render()}catch(e){ctx.setTransform(1,0,0,1,0,0);console.error(e)}G.mmT-=dt;if(G.mmT<=0){G.mmT=0.3;renderMini()}
   const spent=performance.now()-t0;if(spent>50)console.warn('slow frame',spent.toFixed(1)+'ms')}}
 initIcons();resize();bindInput();showTitle();
