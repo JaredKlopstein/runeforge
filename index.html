@@ -520,6 +520,15 @@ function genWorld(seedStr){
  {const a=STARTS[0],b=STARTS[1];const steps=260;let px=a.x,py=a.y;for(let k=0;k<=steps;k++){const t=k/steps;const wob=Math.sin(t*Math.PI*3)*6*Math.sin(t*Math.PI);const x=Math.round(a.x+(b.x-a.x)*t+wob),y=Math.round(a.y+(b.y-a.y)*t-wob);
   for(let dy=0;dy<=1;dy++)for(let dx=0;dx<=1;dx++){const xx=x+dx,yy=y+dy;if(xx>=0&&yy>=0&&xx<N&&yy<N)T[xx+yy*N]=T_ROAD}
   px=x;py=y;}}
+ // thin resource clusters: natural clearings, then lanes through anything wider than ~5 tiles
+ {const isRes=i=>T[i]===T_FOREST||T[i]===T_STONE||T[i]===T_ORE;
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i=x+y*N;if(!isRes(i)||dStart(x,y)<19)continue;const c=n1(x/4+70,y/4+70)*0.6+n3(x/2+30,y/2+30)*0.4;if(c<0.38)T[i]=T_GRASS}
+  const seen=new Uint8Array(N*N);const st=[];
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i0=x+y*N;if(seen[i0]||!isRes(i0))continue;const comp=[];st.length=0;st.push(i0);seen[i0]=1;let minx=x,maxx=x,miny=y,maxy=y;
+   while(st.length){const i=st.pop();comp.push(i);const cx=i%N,cy=(i/N)|0;if(cx<minx)minx=cx;if(cx>maxx)maxx=cx;if(cy<miny)miny=cy;if(cy>maxy)maxy=cy;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const xx=cx+dx,yy=cy+dy;if(xx<0||yy<0||xx>=N||yy>=N)continue;const j=xx+yy*N;if(!seen[j]&&isRes(j)){seen[j]=1;st.push(j)}}}
+   const w=maxx-minx+1,h=maxy-miny+1;if(comp.length<=18&&w<=6&&h<=6)continue;
+   const ox=Math.floor(rng()*5),oy=Math.floor(rng()*5);const lanes=comp.length>60;
+   for(const i of comp){const cx=i%N,cy=(i/N)|0;let cut=false;if(w>6&&((cx-minx+ox)%5===0))cut=true;if(h>6&&((cy-miny+oy)%5===0)&&(lanes||w<=6))cut=true;if(cut&&dStart(cx,cy)>=14)T[i]=T_GRASS}}}
  // nodes
  const nodes=[],nodeAt=new Int32Array(N*N).fill(-1);
  const addNode=(x,y,type,tier)=>{const d=NODE_DEF[type][tier];const n={i:nodes.length,x,y,type,tier,amt:d.amt,max:d.amt,regrow:0};nodes.push(n);nodeAt[x+y*N]=n.i};
@@ -1463,8 +1472,9 @@ function resDropAction(a){const [op,arg]=a.split(':');const tc=G.blds.find(b=>b.
  else if(op==='army'){if(arg==='select')selectArmy();else if(arg==='train'){const bk=G.blds.find(b=>b.team===0&&b.type==='barracks'&&b.built&&!b.dead);if(!bk){showMsg('Build a Barracks first');return}setSel([bk.id],false);doAction('train:guard')}else if(arg==='home'){const tc2=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);const mil=G.units.filter(u=>u.team===0&&!u.dead&&u.type!=='villager'&&!u.inside);if(tc2&&mil.length){const [cx,cy]=bldCenter(tc2);cmdMove(mil,cx,cy+120,false);showMsg('Army returning home')}}}
  else if(op==='smith'){const forge=G.blds.find(b=>b.team===0&&!b.dead&&b.type==='forge'&&b.built);const u=forge&&nearestVillager(...bldCenter(forge));if(!u){showMsg('No villager available');return}dropAuto([u]);u.task={kind:'smith',bld:forge.id};u.orders=null;u.path=null;u.flow=null;setSel([u.id],false);showMsg('Villager sent to smith')}
  refreshResDrop()}
-const VERSION='0.9.1';
+const VERSION='0.9.2';
 const CHANGELOG=[
+ {v:'0.9.2',d:'2026-09-10',t:'Thinner resource clusters',items:['Woods and quarries are broken into small groves and outcrops with natural clearings','Lanes are carved through any cluster wider than about five tiles, so villagers and armies walk through instead of around','Roughly 40% fewer resource tiles, but the largest block shrank from hundreds of tiles to under eighty and most nodes now have a walkable side']},
  {v:'0.9.1',d:'2026-09-10',t:'Open start areas',items:['Guaranteed clearing around each Town Center grown to 11 tiles; resource patches moved to its rim','Two extra exit corridors carved from every base so no start has a single choke','The enemy no longer walls itself in: its builder avoids road tiles and self-sealing spots, and demolishes a building if its base ever gets choked','Placement warns in orange when a spot would narrow your exit and refuses spots that would seal you in']},
  {v:'0.9.0',d:'2026-09-10',t:'Mobile and a sixth round of fixes',items:['Touch play: tap to select and command, drag to pan, pinch to zoom, hold for tooltips, a floating toolbar, two-tap building placement','Phone layouts for the top bar, bottom panel, dialogs and the tutorial','Drag to draw palisade lines; every foundation now claims a builder; sealed / open feedback after walling','Army pill with your soldiers versus the next wave; income shown as gathered versus spent','Esc always cancels placement, Patrol takes a left-click, Idle picks villagers only, "Send a villager" spares your specialists','Lord toned down: smaller home garrison before Iron, Iron Age costs 200 stone, Towers available in Bronze, 400 starting food']},
  {v:'0.8.0',d:'2026-09-10',t:'New look',items:['One button family with clear primary, danger and active states','Icon command card with hotkey badges; selection cards grouped by unit type; unit portraits','Clickable resource pills with income, gatherers, time-to-empty, age requirements and quick actions']},
@@ -1476,7 +1486,7 @@ const CHANGELOG=[
  {v:'0.2.0',d:'2026-09-09',t:'Auto villagers and a visual pass',items:['Auto mode: villagers haul, build, smith, and gather whatever you are short on','Procedural terrain, node, unit and building art with particles and a vignette']},
  {v:'0.1.0',d:'2026-09-09',t:'First playable',items:['96×96 seeded world with fog, six RuneScape-style skills, four resources, seven buildings, three ages','Tick-based combat, four unit types, an AI opponent that runs the same economy, save and load']}];
 const ROADMAP=[
- {t:'Thinner resource clusters',n:'Woods and quarries you can walk through instead of solid blocks',soon:true},
+ {t:'Scarcer mines',n:'Rocks and ore veins that can run dry for good after a few passes, so bases must expand outward',soon:true},
  {t:'A Bronze-age counter unit',n:'Something to trade up with before Rangers and Rams'},
  {t:'Replays',n:'Record a match as commands and watch it back; the groundwork for multiplayer'},
  {t:'Two-player matches',n:'Deterministic lockstep over a data channel, host-and-join by room code'},

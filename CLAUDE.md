@@ -141,6 +141,10 @@ CSS block "Design system v2" at the end of the stylesheet overrides earlier rule
 - `STARTS` are (14,14) and (81,81); the guaranteed clearing is 11 tiles (water only beyond 13), the tier-0/1/2 patches sit on its rim, and a 2-wide grass corridor is carved from each start toward the map center on both axes (8–26 tiles out) so every base has at least two exits besides the road.
 - `sealRatio(type,tx,ty,team)` = reachable tiles after / before a hypothetical footprint. Player: refused below 0.75 (`wouldSeal`), orange "narrows your exit" hint below 0.9 on the ghost. AI `pickSpot` skips road tiles and any spot below 0.8; house/farm/forge anchors come from `aiRing(tc,rMin,rMax)`. `aiRescue()` (every 10s) demolishes the building whose removal most restores reach when the AI's reachable area falls under 350 tiles.
 
+## Resource cluster thinning
+
+After terrain noise and the road, `genWorld` runs a thinning pass before nodes are created: a clearing noise (`n1`/`n3`, threshold 0.38) turns resource tiles more than 19 tiles from a start back to grass, then a 4-connected flood fill finds every forest/stone/ore component; any component over 18 tiles or wider/taller than 6 gets grass lanes every 5 tiles (random offset per component) along its long axis, both axes if over 60 tiles, never within 14 tiles of a start. Typical result: ~1750 nodes (was ~3000), largest cluster under 80 tiles (was 400–1350), walkable area up ~30%. Test harness pattern: extract `genWorld` with node and count components/reach.
+
 ## What's New screen
 
 `VERSION`, `CHANGELOG` (newest first: `{v,d,t,items[]}`) and `ROADMAP` (`{t,n,soon?}`) live just above `toggleSkills`. `showNews(fromGame)` renders `#news` (title button `#b-news`, pause-menu `#m-news`, hash `#news`), marks `runeforge_seen_ver`, and `refreshNewsDot` shows the cyan dot on the title button until the current version has been opened. **Bump `VERSION` and add a `CHANGELOG` entry with every user-visible change.**
@@ -151,5 +155,4 @@ CSS block "Design system v2" at the end of the stylesheet overrides earlier rule
 - (done) Top bar: `nowrap` children, `#word` hidden under 1560px, buttons trimmed under 1400/1240px.
 - (done) Enemy fog: `G.exploredE` / `G.visibleE` are the AI's own maps, filled in `updateVision`. `aiSees(x,y)` / `aiKnows(x,y)` gate threat detection, wave targets (unknown TC → march to the player's start), and straggler targets. Saved as `exploredE`.
 - (done) Every right-click job in `issueCommand` goes through `giveOrder`. `updateUnit` pops the next queued order when `task` is null (before Auto re-picks). A gather with queued orders ends after one delivered load (`gatherStep` deposit) so `gather → build → gather` works.
-- Resource clusters are still large and can block movement (user request: thin them out next).
 - Playtests are run by three parallel Claude-in-Chrome subagents (first-timer / builder / rusher) in their own tabs with `?bg=1`; they cannot see each other's tabs.
