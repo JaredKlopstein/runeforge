@@ -115,6 +115,10 @@ Title → **Tutorial** (or `#tutorial`). `startTutorial()` starts a Squire game 
 
 Top-bar pills with `data-res` (wood/stone/ore/food/pop/age/arms) open `#resdrop` on click (`toggleResDrop`, content from `resDropHtml`, refreshed every second while open, closed by outside mousedown or Esc). Income comes from `G.hist`, a per-second stock sample ring (90 entries) pushed in `update`; `incomePerMin(k)` reads the 30s delta. Actions are `data-ract` buttons routed through `resDropAction` and only call existing commands (gather/build placement/upgrade/smith). Hover tooltips are suppressed on the open pill.
 
+## UI design system (v2)
+
+CSS block "Design system v2" at the end of the stylesheet overrides earlier rules; edit there. Tokens: `--font-ui` (Palatino) for titles only, `--font-body` (system sans) for text, `--font-mono` for numbers/timers (`.num` and the top-bar value spans). One button family (`#topbar/#panel/.ov/#resdrop/#tutor button`, 28px) with variants `.primary` (gold, key action), `.danger` (red), `.on` (rune cyan, active state), `.locked`. The command card `#cmds` is a 4-column grid of 56px icon tiles: `btn()` in `refreshPanel` emits `<canvas class="cico" data-ico>` + `.lbl` + `.k` hotkey badge; `iconFor(act)` maps actions to icon kinds; `drawCmdIcon` draws every building/unit/action glyph on an 18-unit grid; `iconImg` caches offscreen canvases; `paintIcons(root)` fills any `canvas.cico`. Selection cards group by type with a count badge and mean-HP bar (`data-type`; click isolates, shift-click removes). Top-bar Idle and Next army are `.res.stat` pills with `.has` / `.hot` / `.alarm` states.
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
