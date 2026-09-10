@@ -101,6 +101,16 @@ If `!UI.ingame`, only `renderBoot`. Else update + `render`. Worker (`bg=1`) call
 
 Title → **Tutorial** (or `#tutorial`). `startTutorial()` starts a Squire game on seed `tutor` with the starting villagers Auto OFF, first army at 10:00, `ai.soft` (first wave 2 units, later waves one smaller), and `G.tutorial={i,shown,t}`. `TUT_STEPS` is an ordered list of `{title,text,done(),onStart?}`; `tutorTick` (called from `update`) checks `done()` every 0.3s and advances with a flash on the `#tutor` card. Skip / Exit buttons on the card. Step 11's `onStart` pulls the next wave to +40s. The step index is saved (`st.tutorial`) and restored on Continue.
 
+## Round-five fixes (Claude)
+
+- Tutorial: step 11 spawns a scripted 2-guard raid (`G.tutRaidT`, `u.tutRaider`) 30s after the step starts, independent of the AI wave timer; cards say when they complete; the last card is a closing card (Exit ends the tutorial). `showTitle` hides the card.
+- Seal check counts own gates as passable even while unbuilt (`SEAL_CHECK` flag read by `gateWalkable`). The build ghost shows "would seal your base" in orange before the click.
+- Army ETA: `ai.atWalls` when any marcher is within 4 tiles of a player building → HUD reads "Enemy army at your walls".
+- Auto-engaged pursuits (idle scan, retaliation, response-to-attack) carry `leashX/leashY`; a chaser more than 12 tiles from its leash point gives up, blacklists the target for 20s and walks back.
+- Scout reports use `G.scoutPing` (Space jumps there after any attack alert), not the attack banner.
+- Rune Stone is placed on the grass tile nearest the center that is reachable from the player's TC with at least 5 open neighbours; the AI relic squad gets `relicGuard` + hold stance and is skipped by straggler and siege logic.
+- Frame loop caps simulated time at 1.2× game speed per real second and stops simulating 90s after game over. Defeat/victory clears the autosave. New units start with `stance:'aggro'`.
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
