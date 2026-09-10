@@ -78,6 +78,14 @@ kbd{background:#3a2f1c;border:1px solid #8a6d3b;border-radius:3px;padding:0 5px;
 #tutor #tt-title{font-family:var(--font-ui);font-size:16px;color:var(--gold2);margin-bottom:3px}
 #tutor kbd{margin:0 1px}
 #tutor.done{border-color:#9fe27a;box-shadow:0 0 16px rgba(159,226,122,.35)}
+#tutor{z-index:7}
+#tutor .tt-head{cursor:pointer}
+#tt-chev{margin-left:auto;margin-right:8px;color:var(--gold);font-size:12px;transition:transform .15s}
+#tutor.collapsed #tt-text{display:none}
+#tutor.collapsed #tt-title{margin:0;font-size:13px;display:inline}
+#tutor.collapsed .tt-head{margin-bottom:0}
+#tutor.collapsed #tt-chev{transform:rotate(-90deg)}
+#tutor.collapsed{padding:6px 10px}
 #alert{position:absolute;left:50%;top:50px;transform:translateX(-50%);z-index:7;pointer-events:none;background:rgba(120,20,10,.92);border:1px solid #ff7a5a;color:#ffe0d0;padding:5px 16px;border-radius:4px;font-size:13px;display:none;box-shadow:0 0 18px rgba(255,80,50,.5);animation:alertpulse 1s infinite}
 @keyframes alertpulse{50%{border-color:#ffd0c0}}
 #mode{position:absolute;left:50%;bottom:210px;transform:translateX(-50%);z-index:6;pointer-events:none;color:#9fff9a;font-size:13px;background:rgba(0,0,0,.65);border:1px solid rgba(125,255,122,.4);padding:3px 12px;border-radius:4px;display:none}
@@ -213,10 +221,11 @@ body.touch #tip{max-width:240px}
  .skl{grid-template-columns:auto 1fr auto auto 1fr auto;gap:1px 6px;font-size:10px;margin-top:2px}
  .units div{width:38px;height:42px}.units div canvas{width:24px;height:24px}
  #tutor,#resdrop{width:min(300px,calc(100vw - 70px));font-size:12px}
- #tutor{top:48px;left:8px}
+ #tutor{top:46px;left:6px;width:min(320px,calc(100vw - 12px));padding:7px 10px;max-height:44vh;overflow:auto}
+ #tutor #tt-text{font-size:12px;line-height:1.35}
+ #msg{top:auto;bottom:212px;font-size:11px;max-width:70vw}
  #resdrop{top:44px}
  #alert{top:46px;font-size:12px;padding:4px 10px;max-width:70vw}
- #msg{top:70px;font-size:12px;max-width:80vw}
  #mode{bottom:158px;font-size:12px;max-width:90vw;flex-wrap:wrap;justify-content:center}
  .box{padding:14px 14px 12px;font-size:12px;max-height:92vh;width:96%}
  .box h2{font-size:20px}
@@ -254,7 +263,8 @@ body.touch #tip{max-width:240px}
  .boot-col{gap:4px}.boot-btn{padding:6px 12px;font-size:14px}
  .box{max-height:94vh;padding:10px 12px}
  .box h2{font-size:18px;margin-bottom:6px}
- #tutor{width:220px;font-size:11px}
+ #tutor{width:min(340px,calc(100vw - 12px));font-size:11px;max-height:52vh}
+ #msg{top:auto;bottom:138px;left:8px;right:auto;transform:none;text-align:left;max-width:52vw;font-size:11px}
  #mode{bottom:140px}
 }
 </style></head><body>
@@ -298,7 +308,7 @@ body.touch #tip{max-width:240px}
 <div id="mode"><span id="mode-text"></span><button id="mode-cancel">Cancel</button></div>
 <div id="touchbar"><button data-tb="box" data-tip="Box select: drag to select units">▭</button><button data-tb="multi" data-tip="Add to selection (like Shift)">+</button><button data-tb="amove" data-tip="Attack-move: then tap a target">⚔</button><button data-tb="idle" data-tip="Next idle villager">☺</button><button data-tb="army" data-tip="Select the army">⚑</button><button data-tb="home" data-tip="Jump to the last attack or your Town Center">⌂</button></div>
 <div id="resdrop"></div>
-<div id="tutor"><div class="tt-head"><span id="tt-prog">Tutorial 1/12</span><span class="tt-btns"><button id="tt-skip" data-tip="Skip this objective">Skip</button><button id="tt-exit" data-tip="Leave the tutorial and keep playing">Exit</button></span></div><div id="tt-title">Objective</div><div id="tt-text"></div></div>
+<div id="tutor"><div class="tt-head" id="tt-head"><span id="tt-prog">Tutorial 1/12</span><span id="tt-chev">▾</span><span class="tt-btns"><button id="tt-skip" data-tip="Skip this objective">Skip</button><button id="tt-exit" data-tip="Leave the tutorial and keep playing">Exit</button></span></div><div id="tt-title">Objective</div><div id="tt-text"></div></div>
 <div id="alert"><b>⚠ Under attack!</b> <span id="alert-where"></span> — press <kbd>Space</kbd> to jump there</div>
 <div id="panel">
  <div id="mmwrap"><canvas id="mm" width="180" height="180"></canvas></div>
@@ -1239,6 +1249,18 @@ function paintLobbyMap(seed){const w=genWorld(seed||'rune');const c=$('lobmap').
  c.fillStyle='#8fd0ff';c.fillRect(STARTS[0].x/N*240-4,STARTS[0].y/N*240-4,10,10);c.fillStyle='#ff7a6a';c.fillRect(STARTS[1].x/N*240-4,STARTS[1].y/N*240-4,10,10)}
 function syncSettings(){$('s-mute').checked=CFG.mute;$('s-music').value=Math.round(CFG.music*100);$('s-sfx').value=Math.round(CFG.sfx*100);$('s-music-v').textContent=Math.round(CFG.music*100)+'%';$('s-sfx-v').textContent=Math.round(CFG.sfx*100)+'%';$('s-edge').checked=CFG.edge;$('s-tut').checked=CFG.tut}
 function applySettings(){CFG.mute=$('s-mute').checked;CFG.music=($('s-music').value|0)/100;CFG.sfx=($('s-sfx').value|0)/100;CFG.edge=$('s-edge').checked;CFG.tut=$('s-tut').checked;saveCfg();syncSettings();MUS.setVol();if(CFG.mute)MUS.stop()}
+const TUT_TOUCH={0:'Tap one of the four villagers below the Town Center. Selected units show a green ring and appear in the bottom panel. To grab all four, tap the ▭ button on the toolbar and drag a box around them.',
+1:'With villagers selected, <b>tap a tree</b>. They walk over, swing, and haul wood back. Every swing earns Woodcutting XP.',
+2:'Send at least one villager to the pond: select it and tap a fish. Food trains everything, so never let it run dry.',
+3:'Select a villager, tap the <b>House</b> tile in the strip above the panel, tap open grass near the Town Center to position it, then tap the same spot again to confirm. Red tiles block placement. Each House adds 5 population.',
+4:'Tap the Town Center, then tap <b>Train Villager</b> twice. New villagers start on <b>Auto</b>: they pick jobs themselves. The ☺ button finds an idle villager any time.',
+5:'Select all four starting villagers (▭ then drag a box) and tap <b>Auto</b> once. It toggles. Auto villagers gather what you are short on, help build, repair, and run into the Town Center when raiders come.',
+6:'Select a villager, tap the <b>Farm</b> tile, position it with a tap and confirm with a second tap. The villager builds it and then works it. Farms feed you forever.',
+7:'With villagers selected, tap the <b>Barracks</b> tile and place it inside your base (tap, then tap again). It trains Scouts, Guards and later siege. Completes when it is finished.',
+8:'Tap the Barracks, then tap <b>Train Scout</b> and wait for it to walk out. Scouts explore on their own and report enemy buildings. Watch the minimap fill in.',
+9:'Tap <b>Train Guard</b> at the Barracks until three Guards have walked out. The top bar counts down to the enemy army; Guards near your base fight on their own.',
+10:'Two raiders are coming from the south-east in about 30 seconds. When the red <b>Under attack</b> banner appears, tap ⌂ on the toolbar to jump there. Select your Guards, tap ⚔, then tap near the raiders. Villagers garrison in the Town Center by themselves. Completes when a raider falls.',
+11:'You know the loop. From here: tap the Town Center and tap <b>Iron Age</b> when it lights for Rangers, Rams, Towers and the Forge; upgrade buildings from their panel; and raze the enemy Town Center in the south-east. Tap <b>Exit</b> to close this card and keep playing.'};
 const TUT_STEPS=[
  {title:'Meet your villagers',text:'Drag a box around the four villagers below the Town Center (or click one). Selected units show a green ring and appear in the bottom panel.',done:()=>UI.sel.some(id=>{const u=G.byId.get(id);return u&&u.kind==='u'&&u.type==='villager'})},
  {title:'Chop wood',text:'With villagers selected, <b>right-click a tree</b>. They walk over, swing, and haul wood back. Every swing earns Woodcutting XP.',done:()=>G.units.some(u=>u.team===0&&u.type==='villager'&&u.task&&u.task.kind==='gather'&&u.task.node>=0&&G.nodes[u.task.node].type==='wood')},
@@ -1253,7 +1275,7 @@ const TUT_STEPS=[
  {title:'Hold the line',text:'Two raiders are coming from the south-east in about 30 seconds. When the red <b>Under attack</b> banner appears, press <kbd>Space</kbd> to jump there. Select your Guards, press <kbd>Z</kbd> and click near the raiders. Villagers garrison in the Town Center by themselves. Completes when a raider falls.',done:()=>G.stats&&G.stats.killed>=1,onStart:()=>{G.tutRaidT=G.time+30}},
  {title:'Tutorial complete',text:'You know the loop. From here: click the Town Center and press <b>Advance to Iron</b> when it lights (350 wood, 250 stone, 200 food, six best units averaging skill 8) for Rangers, Rams, Towers and the Forge; upgrade buildings with <kbd>U</kbd>; and raze the enemy Town Center in the south-east. Press <b>Exit</b> to close this card and keep playing, or Esc → Resign for a fresh Skirmish.',done:()=>false}];
 function startTutorial(){CFG.diff=0;newGame('tutor');G.tutorial={i:0,shown:-1,t:0};G.ai.nextWave=600;G.ai.targetVil=6;G.ai.soft=true;for(const u of G.units)if(u.team===0)u.auto=false;enterPlay();showMsg('Tutorial: follow the objectives in the top-left card');tutorShow()}
-function tutorShow(){const el=$('tutor');const T=G&&G.tutorial;if(!T||T.i>=TUT_STEPS.length){el.classList.remove('show');return}const st=TUT_STEPS[T.i];if(st.title==='Tutorial complete'&&!T.fanfare){T.fanfare=true;showMsg('Tutorial complete — the rest is war. Good luck!');SND.play(523,0.2,'triangle',0.06);setTimeout(()=>SND.play(784,0.4,'triangle',0.06),180)}el.classList.add('show');el.classList.remove('done');$('tt-prog').textContent='Tutorial '+(T.i+1)+'/'+TUT_STEPS.length;$('tt-title').textContent=st.title;$('tt-text').innerHTML=st.text;if(T.shown!==T.i){T.shown=T.i;if(st.onStart)st.onStart()}}
+function tutorShow(){const el=$('tutor');const T=G&&G.tutorial;if(!T||T.i>=TUT_STEPS.length){el.classList.remove('show');return}const st=TUT_STEPS[T.i];if(st.title==='Tutorial complete'&&!T.fanfare){T.fanfare=true;showMsg('Tutorial complete — the rest is war. Good luck!');SND.play(523,0.2,'triangle',0.06);setTimeout(()=>SND.play(784,0.4,'triangle',0.06),180)}el.classList.add('show');el.classList.remove('done');$('tt-prog').textContent='Tutorial '+(T.i+1)+'/'+TUT_STEPS.length;$('tt-title').textContent=st.title;$('tt-text').innerHTML=(IS_TOUCH&&TUT_TOUCH[T.i])||st.text;el.classList.remove('collapsed');clearTimeout(UI.tutCollapse);if(document.body.classList.contains('short'))UI.tutCollapse=setTimeout(()=>{if(el.classList.contains('show'))el.classList.add('collapsed')},9000);if(T.shown!==T.i){T.shown=T.i;if(st.onStart)st.onStart()}}
 function tutorAdvance(skip){const T=G&&G.tutorial;if(!T)return;T.i++;if(T.i<TUT_STEPS.length){const st=TUT_STEPS[T.i];T.shown=T.i;if(st.onStart)try{st.onStart()}catch(e){}}if(T.i>=TUT_STEPS.length||TUT_STEPS[T.i].title==='Tutorial complete'&&skip){$('tutor').classList.remove('show');showMsg('Tutorial complete — the rest is war. Good luck!');SND.play(523,0.2,'triangle',0.06);setTimeout(()=>SND.play(784,0.4,'triangle',0.06),180);G.tutorial=null;return}if(!skip){$('tutor').classList.add('done');SND.play(660,0.12,'triangle',0.05,300);setTimeout(()=>{if(G&&G.tutorial)tutorShow()},700)}else tutorShow()}
 function tutorTick(dt){if(G.tutRaidT&&G.time>=G.tutRaidT){G.tutRaidT=0;const tc=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);if(tc){PASS_TEAM=1;let n=0;for(let r=13;r<=18&&n<2;r++){const sp=nearestPassable(tc.tx+r,tc.ty+r,4);if(sp<0)continue;const g=mkUnit(1,'guard',(sp%N)*TS+16,((sp/N)|0)*TS+16);const gt=nearestPassable(tc.tx+2,tc.ty+5,6);const gx=gt<0?tc.tx+2:gt%N,gy=gt<0?tc.ty+5:(gt/N)|0;g.task={kind:'attackmove',x:gx*TS+16,y:gy*TS+16,tx:gx,ty:gy};g.tutRaider=true;n++}showMsg('Raiders sighted to the south-east!');SND.play(220,0.4,'sawtooth',0.05,-100)}}
  const T=G.tutorial;if(!T||T.i>=TUT_STEPS.length)return;T.t+=dt;if(T.t<0.3)return;T.t=0;let ok=false;try{ok=!!TUT_STEPS[T.i].done()}catch(e){ok=false}if(ok)tutorAdvance(false)}
@@ -1346,7 +1368,7 @@ $('mode-cancel').onclick=()=>{UI.placing=null;UI.mode=null;UI.ghostArmed=false;u
  $('m-save').onclick=()=>{$('savetxt').value=saveGame();autosave();$('m-note').textContent='Save text generated ('+$('savetxt').value.length+' chars). Also written to this browser.'};
  $('m-load').onclick=()=>{try{loadGame($('savetxt').value);$('m-note').textContent='Loaded.';$('menu').classList.remove('show');UI.screen='game';G.paused=false}catch(err){$('m-note').textContent='Load failed: '+err.message}};
  $('m-copy').onclick=()=>{$('savetxt').select();try{document.execCommand('copy');if(navigator.clipboard)navigator.clipboard.writeText($('savetxt').value)}catch(e){}$('m-note').textContent='Copied to clipboard.'};
- $('b-new').onclick=()=>{SND.init();MUS.start();showLobby()};$('b-tutorial').onclick=()=>{SND.init();startTutorial()};$('tt-skip').onclick=()=>tutorAdvance(true);$('tt-exit').onclick=()=>{if(G){G.tutorial=null;$('tutor').classList.remove('show');showMsg('Tutorial ended — keep playing')}};$('b-continue').onclick=()=>{SND.init();continueSave()};$('b-settings').onclick=()=>{SND.init();MUS.start();showSettings('title')};$('b-howto').onclick=()=>{SND.init();MUS.start();openHowto(false)};
+ $('b-new').onclick=()=>{SND.init();MUS.start();showLobby()};$('b-tutorial').onclick=()=>{SND.init();startTutorial()};$('tt-skip').onclick=()=>tutorAdvance(true);$('tt-head').onclick=e=>{if(e.target.closest('button'))return;$('tutor').classList.toggle('collapsed');clearTimeout(UI.tutCollapse)};$('tt-exit').onclick=()=>{if(G){G.tutorial=null;$('tutor').classList.remove('show');showMsg('Tutorial ended — keep playing')}};$('b-continue').onclick=()=>{SND.init();continueSave()};$('b-settings').onclick=()=>{SND.init();MUS.start();showSettings('title')};$('b-howto').onclick=()=>{SND.init();MUS.start();openHowto(false)};
  $('lob-back').onclick=showTitle;$('lob-go').onclick=()=>startSkirmish($('lobseed').value||'rune');$('lob-rand').onclick=()=>{const s=Math.random().toString(36).slice(2,8);$('lobseed').value=s;paintLobbyMap(s)};
  $('lobseed').addEventListener('input',()=>paintLobbyMap($('lobseed').value||'rune'));
  $('s-back').onclick=closeSettings;
