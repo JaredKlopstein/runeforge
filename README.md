@@ -4,7 +4,7 @@ A complete Age-of-Empires-style skirmish in **one HTML file**. Procedural Canvas
 
 **Play:** https://runeforge-six.vercel.app · **Tutorial:** https://runeforge-six.vercel.app/#tutorial
 
-Deploys automatically from `main` via Vercel.
+Deploys automatically from `main` via Vercel. The in-game **What's New** screen (title menu) carries the version, changelog and roadmap.
 
 ```bash
 python3 -m http.server 8765 --bind 0.0.0.0

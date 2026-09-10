@@ -141,6 +141,10 @@ CSS block "Design system v2" at the end of the stylesheet overrides earlier rule
 - `STARTS` are (14,14) and (81,81); the guaranteed clearing is 11 tiles (water only beyond 13), the tier-0/1/2 patches sit on its rim, and a 2-wide grass corridor is carved from each start toward the map center on both axes (8–26 tiles out) so every base has at least two exits besides the road.
 - `sealRatio(type,tx,ty,team)` = reachable tiles after / before a hypothetical footprint. Player: refused below 0.75 (`wouldSeal`), orange "narrows your exit" hint below 0.9 on the ghost. AI `pickSpot` skips road tiles and any spot below 0.8; house/farm/forge anchors come from `aiRing(tc,rMin,rMax)`. `aiRescue()` (every 10s) demolishes the building whose removal most restores reach when the AI's reachable area falls under 350 tiles.
 
+## What's New screen
+
+`VERSION`, `CHANGELOG` (newest first: `{v,d,t,items[]}`) and `ROADMAP` (`{t,n,soon?}`) live just above `toggleSkills`. `showNews(fromGame)` renders `#news` (title button `#b-news`, pause-menu `#m-news`, hash `#news`), marks `runeforge_seen_ver`, and `refreshNewsDot` shows the cyan dot on the title button until the current version has been opened. **Bump `VERSION` and add a `CHANGELOG` entry with every user-visible change.**
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
