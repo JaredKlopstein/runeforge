@@ -2,6 +2,10 @@
 
 A complete Age-of-Empires-style skirmish in **one HTML file**. Procedural Canvas 2D art, WebAudio, no build step.
 
+**Play:** https://runeforge-six.vercel.app · **Tutorial:** https://runeforge-six.vercel.app/#tutorial
+
+Deploys automatically from `main` via Vercel.
+
 ```bash
 python3 -m http.server 8765 --bind 0.0.0.0
 # open http://127.0.0.1:8765/index.html
@@ -9,7 +13,7 @@ python3 -m http.server 8765 --bind 0.0.0.0
 
 ## Play
 
-Title → **New Skirmish** → pick a seed and hostility → **March to War**. Destroy the enemy Town Center.
+Title → **Tutorial** for a guided first game, or **New Skirmish** → pick a seed and hostility → **March to War**. Destroy the enemy Town Center.
 
 Hotkeys (also in the in-game pause menu):
 
