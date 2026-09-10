@@ -4,7 +4,7 @@ Single-file browser RTS. **All game code, art, UI, and audio live in `index.html
 
 Run: `python3 -m http.server 8765 --bind 0.0.0.0` from this directory, then open `http://127.0.0.1:8765/index.html`. Hard-refresh after edits.
 
-This file is the handoff from a Grok session (2026-09-09) that continued Claude session `b9b033c9-cd3d-4eb3-bc76-273aff702e9e`. Claude built the original playable game and two playtest/fix rounds. Grok resumed mid round-three freeze fix and then added presentation, art, units, and QoL.
+This file is the handoff between the Claude session `b9b033c9-cd3d-4eb3-bc76-273aff702e9e` and a Grok session (2026-09-09). Claude built the original playable game and two playtest/fix rounds; Grok resumed mid round-three freeze fix and added presentation, art, units, and QoL; Claude then took Grok's open items (below) and continued. The folder is now a git repo — commit after each working change.
 
 ## Constraints (do not break)
 
@@ -88,7 +88,7 @@ If `!UI.ingame`, only `renderBoot`. Else update + `render`. Worker (`bg=1`) call
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
-- Top bar is tight at 1440px with Idle + Arms wrapping.
-- Enemy fog is player-only (`G.explored` / `G.visible` are team 0).
-- Shift-queue does not apply to gather/build the same way as move (move/attack-move go through `giveOrder`; some right-click jobs still assign `u.task` directly).
-- No git repo in this folder.
+- (done) Top bar: `nowrap` children, `#word` hidden under 1560px, buttons trimmed under 1400/1240px.
+- (done) Enemy fog: `G.exploredE` / `G.visibleE` are the AI's own maps, filled in `updateVision`. `aiSees(x,y)` / `aiKnows(x,y)` gate threat detection, wave targets (unknown TC → march to the player's start), and straggler targets. Saved as `exploredE`.
+- (done) Every right-click job in `issueCommand` goes through `giveOrder`. `updateUnit` pops the next queued order when `task` is null (before Auto re-picks). A gather with queued orders ends after one delivered load (`gatherStep` deposit) so `gather → build → gather` works.
+- Playtests are run by three parallel Claude-in-Chrome subagents (first-timer / builder / rusher) in their own tabs with `?bg=1`; they cannot see each other's tabs.
