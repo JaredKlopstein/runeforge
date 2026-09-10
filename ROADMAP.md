@@ -35,7 +35,7 @@ Each phase is one or two sessions of work and ships as its own version. Order is
 4. Audio pass: unit trained, selection ack (short two-note blip per unit type), gate toggle, tower fire, relic captured, UI click; a second music layer that fades in while `G.alert` is fresh (reuse `MUS` scheduler).
 5. Perf quick wins: cache the sorted building/unit draw lists per frame only when counts change; precompute water sparkle offsets per tile; reuse `SH` bucket arrays instead of a new `Map`; chunk `R.terr` into 6×6 tile canvases (16 of 384 px) so mobile never allocates 37 MB.
 
-### Phase B — v0.9.5 "Skills you can see" (the discussed gear pass)
+### Phase B — "Skills you can see" — SHIPPED as v0.9.6 on 2026-09-10 (v0.9.5 was the round-seven playtest fixes)
 1. Villager tools by task and skill bracket in `drawUnit` (L935): hatchet (wood), pick (stone/ore), rod (fish), hammer (build/smith); head color by bracket: bronze <10, steel 10–29, cyan (rune) 30+. Reuse `AGE_COL` palette.
 2. Villager milestone cosmetics: cap/hood at 20 and a cape at 45 in the villager's best skill, colored per skill (`SKILL_COL` if present, else add one). Mirrors RuneScape milestone capes.
 3. Soldier armor by Combat bracket layered over age color: breastplate outline at 10, pauldrons at 20 (with existing chevron), plume at 35. Arms cap adds a sword glint.
