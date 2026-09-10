@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Runeforge — Ages of the Skilled</title>
 <style>
 :root{--gold:#e2b85c;--gold2:#f3e2b0;--bronze:#8a6d3b;--ink:#0c0a07;--panel:#1a140e;--rune:#6fe4ff;--font-ui:Palatino Linotype,Palatino,"Book Antiqua",Georgia,serif;--font-mono:ui-monospace,Menlo,Consolas,monospace}
@@ -175,6 +175,88 @@ kbd{font-family:var(--font-mono);font-size:11px;border-radius:3px;padding:0 5px;
 #alert{border-radius:var(--r);font-family:var(--font-body);font-weight:600}
 #tip{font-family:var(--font-body);border-radius:var(--r);border:1px solid var(--line);box-shadow:0 0 0 2px #0c0906,0 6px 16px rgba(0,0,0,.7)}
 #mode{font-family:var(--font-body);border-radius:var(--r)}
+
+/* ===== Mobile / touch ===== */
+canvas#c{touch-action:none;-webkit-tap-highlight-color:transparent}
+body{-webkit-touch-callout:none;overscroll-behavior:none}
+#mode{display:none;align-items:center;gap:10px;pointer-events:auto}
+#mode button{height:24px;padding:0 10px;font-size:11px}
+.touchonly{display:none}body.touch .touchonly{display:block}
+#touchbar{position:absolute;right:8px;top:52px;z-index:6;display:none;flex-direction:column;gap:6px}
+body.touch.play #touchbar{display:flex}
+#touchbar button{width:44px;height:44px;padding:0;font-size:20px;line-height:1;border-radius:6px;box-shadow:0 0 0 2px #0c0906,0 3px 8px rgba(0,0,0,.6)}
+#touchbar button.on{background:linear-gradient(#1f4a56,#12303a);border-color:var(--rune);color:#dff7ff}
+body.touch #tip{max-width:240px}
+/* narrow (phones, small tablets) */
+@media (max-width:900px){
+ #topbar{height:40px;gap:4px;padding:0 6px;font-size:12px}
+ #word,#b-help,#b-skills,#r-time{display:none}
+ .res{height:26px;min-width:0;padding:0 7px 0 4px;gap:4px;font-size:12px}
+ .res canvas{width:16px;height:16px}
+ #r-age{display:none}.res[data-res=age]{min-width:0!important}
+ #r-arms{font-size:11px}
+ #wavepill #r-wave{max-width:110px;overflow:hidden;text-overflow:ellipsis}
+ #topbar button{height:26px;padding:0 8px;font-size:11px}
+ #panel{height:150px;flex-wrap:wrap;align-content:flex-start}
+ #cmds{order:-1;width:100%;height:64px;display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:5px;padding:5px 8px;border-bottom:1px solid var(--line2);scrollbar-width:none}
+ #cmds::-webkit-scrollbar{display:none}
+ #cmds:empty{display:none}
+ #cmds button{flex:none;width:66px;height:52px;padding:3px 3px 2px}
+ #cmds button canvas{width:22px;height:22px}
+ #cmds button .lbl{font-size:9.5px;max-width:60px}
+ #mmwrap{width:96px;padding:5px;border-right:1px solid var(--line2)}
+ #mm{width:84px;height:84px}
+ #sel{padding:6px 10px;gap:8px;border-right:0;overflow:hidden}
+ #portrait{width:52px;height:52px}
+ #sel h3{font-size:14px;margin-bottom:2px}
+ #sel .dim{font-size:11px;line-height:1.3}
+ .skl{grid-template-columns:auto 1fr auto auto 1fr auto;gap:1px 6px;font-size:10px;margin-top:2px}
+ .units div{width:38px;height:42px}.units div canvas{width:24px;height:24px}
+ #tutor,#resdrop{width:min(300px,calc(100vw - 70px));font-size:12px}
+ #tutor{top:48px;left:8px}
+ #resdrop{top:44px}
+ #alert{top:46px;font-size:12px;padding:4px 10px;max-width:70vw}
+ #msg{top:70px;font-size:12px;max-width:80vw}
+ #mode{bottom:158px;font-size:12px;max-width:90vw;flex-wrap:wrap;justify-content:center}
+ .box{padding:14px 14px 12px;font-size:12px;max-height:92vh;width:96%}
+ .box h2{font-size:20px}
+ .keys{grid-template-columns:auto 1fr}
+ .steps{font-size:12px}
+ #bootui{padding:6vh 6vw}
+ .brand{margin-bottom:14px}
+ .boot-col{width:min(280px,86vw);gap:6px}
+ .boot-btn{padding:9px 14px;font-size:16px}
+}
+/* very narrow (phones in portrait) */
+@media (max-width:600px){
+ .res[data-res=arms],#b-speed,#b-pause,#r-relic{display:none!important}
+ #idlepill #r-idle,#wavepill #r-wave{font-size:11px}
+ #wavepill{max-width:118px}
+ .res{padding:0 5px 0 3px;gap:3px}
+ #topbar{gap:3px;padding:0 66px 0 4px;overflow-x:auto;scrollbar-width:none}
+ #topbar::-webkit-scrollbar{display:none}
+ #topbar .sp{flex:0 0 2px}
+ #b-menu{position:fixed;right:4px;top:7px;z-index:9;box-shadow:-16px 0 14px -4px #15100a,0 2px 3px rgba(0,0,0,.45)}
+ #touchbar{top:auto;bottom:158px;right:6px;flex-direction:row;gap:4px}
+ #touchbar button{width:40px;height:40px;font-size:17px}
+ #mode{bottom:204px}
+}
+/* short landscape phones */
+@media (max-height:520px){
+ #topbar{height:36px}
+ #panel{height:132px}
+ #cmds{height:58px}
+ #cmds button{height:48px}
+ #mmwrap{width:80px}#mm{width:70px;height:70px}
+ #touchbar{top:auto;bottom:138px;right:8px;flex-direction:row;gap:4px}#touchbar button{width:40px;height:40px;font-size:17px}
+ #bootui{padding:3vh 6vw;justify-content:flex-start;overflow:auto}
+ .brand{margin-bottom:8px}.brand h1{font-size:clamp(28px,6vh,52px)}
+ .boot-col{gap:4px}.boot-btn{padding:6px 12px;font-size:14px}
+ .box{max-height:94vh;padding:10px 12px}
+ .box h2{font-size:18px;margin-bottom:6px}
+ #tutor{width:220px;font-size:11px}
+ #mode{bottom:140px}
+}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="bootui" class="title">
@@ -213,7 +295,8 @@ kbd{font-family:var(--font-mono);font-size:11px;border-radius:3px;padding:0 5px;
  <button id="b-menu" data-tip="Menu, seed, save/load (Esc)">Menu</button>
 </div>
 <div id="msg"></div>
-<div id="mode"></div>
+<div id="mode"><span id="mode-text"></span><button id="mode-cancel">Cancel</button></div>
+<div id="touchbar"><button data-tb="box" data-tip="Box select: drag to select units">▭</button><button data-tb="multi" data-tip="Add to selection (like Shift)">+</button><button data-tb="amove" data-tip="Attack-move: then tap a target">⚔</button><button data-tb="idle" data-tip="Next idle villager">☺</button><button data-tb="army" data-tip="Select the army">⚑</button><button data-tb="home" data-tip="Jump to the last attack or your Town Center">⌂</button></div>
 <div id="resdrop"></div>
 <div id="tutor"><div class="tt-head"><span id="tt-prog">Tutorial 1/12</span><span class="tt-btns"><button id="tt-skip" data-tip="Skip this objective">Skip</button><button id="tt-exit" data-tip="Leave the tutorial and keep playing">Exit</button></span></div><div id="tt-title">Objective</div><div id="tt-text"></div></div>
 <div id="alert"><b>⚠ Under attack!</b> <span id="alert-where"></span> — press <kbd>Space</kbd> to jump there</div>
@@ -260,6 +343,7 @@ kbd{font-family:var(--font-mono);font-size:11px;border-radius:3px;padding:0 5px;
   <li><b>Arm.</b> Press <kbd>B</kbd> for a Barracks. Select it and press <kbd>N</kbd> for a Scout (it explores by itself) and <kbd>G</kbd> for Guards. The top bar counts down to the next enemy army.</li>
   <li><b>Age up.</b> When the Town Center's Advance button lights, take the Iron Age for Rangers, Rams, Towers and the Forge. Upgrade buildings with <kbd>U</kbd> as Construction rises.</li>
  </ol>
+ <div class="touchonly"><h3 style="margin:10px 0 4px">On a touch screen</h3><p style="margin:0 0 6px">Tap a unit or building to select it. With units selected, tap a tree, fish, building or the ground to give the same order a right-click gives. Drag with one finger to pan, pinch to zoom, hold a finger on anything for its tooltip. The toolbar on the right gives you box-select, add-to-selection, attack-move, next idle villager, select army, and jump home. Placing a building: tap to position it, tap the same spot again to confirm.</p></div>
  <h3 style="margin:10px 0 4px">Keys</h3>
  <div class="keys">
   <kbd>Left drag</kbd><span>box-select</span><kbd>Shift</kbd><span>add to selection · queue orders with right-click</span>
@@ -705,7 +789,7 @@ function aiThink(){const team=G.teams[1],ai=G.ai;let threatNow=false;for(const u
 // RENDER — procedural Canvas 2D art
 // ============================================================
 const cv=document.getElementById('c');let ctx=cv.getContext('2d');
-const cam={x:0,y:0,z:1};
+const cam={x:0,y:0,z:1};let DPR=1,VW=innerWidth,VH=innerHeight;const IS_TOUCH=(window.matchMedia&&matchMedia('(pointer: coarse)').matches)||('ontouchstart' in window&&navigator.maxTouchPoints>0)||/[?&]touch=1/.test(location.search);
 const R={terr:null,tctx:null,fogC:null,fogCtx:null,fogData:null,mmBase:null,
  init(){this.terr=document.createElement('canvas');this.terr.width=this.terr.height=WPX;this.tctx=this.terr.getContext('2d');
   this.fogC=document.createElement('canvas');this.fogC.width=this.fogC.height=N;this.fogCtx=this.fogC.getContext('2d');this.fogData=this.fogCtx.createImageData(N,N);{const d=this.fogData.data;for(let k=0;k<N*N;k++){d[k*4]=8;d[k*4+1]=11;d[k*4+2]=18;d[k*4+3]=255}}
@@ -905,7 +989,7 @@ function drawBld(b,sel){const c=ctx,col=TEAM_COL[b.team],dark=TEAM_DARK[b.team],
  if(sel||b.hp<b.maxhp){c.fillStyle='rgba(0,0,0,0.75)';c.fillRect(x+3,y-9,w-6,6);c.fillStyle='#7a2418';c.fillRect(x+4,y-8,w-8,4);const f=clamp(b.hp/b.maxhp,0,1);c.fillStyle=f>0.5?'#7bd44a':f>0.25?'#e0b040':'#e04a3a';c.fillRect(x+4,y-8,(w-8)*f,4)}
  if(b.queue.length&&b.team===0){const q=b.queue[0];c.fillStyle='rgba(0,0,0,0.75)';c.fillRect(x+3,y+h+2,w-6,6);c.fillStyle='#e2b85c';c.fillRect(x+4,y+h+3,(w-8)*(1-q.t/q.tot),4)}}
 function drawWater(tx0,ty0,tx1,ty1){const c=ctx;const T=G.T;for(let y=ty0;y<=ty1;y++)for(let x=tx0;x<=tx1;x++){const i=x+y*N;if(T[i]!==T_WATER)continue;const h=tileHash(x+41,y+17);if(h<0.48)continue;const ph=G.time*1.7+h*20;const a=0.5+0.5*Math.sin(ph);if(a<0.28)continue;c.globalAlpha=(a-0.28)*0.85;c.fillStyle='#e8f6ff';const sx=x*TS+4+h*20,sy=y*TS+6+tileHash(x+5,y+9)*20;c.fillRect(sx,sy,6+a*5,1.6);if(h>0.82){c.fillStyle='#fff';c.globalAlpha=(a-0.28)*0.5;c.beginPath();c.arc(sx+3,sy,1.2,0,7);c.fill()}}c.globalAlpha=1}
-function render(){const W=cv.width,H=cv.height;ctx.fillStyle='#0a0c10';ctx.fillRect(0,0,W,H);
+function render(){const W=VW,H=VH;ctx.fillStyle='#0a0c10';ctx.fillRect(0,0,W,H);
  ctx.save();ctx.scale(cam.z,cam.z);ctx.translate(-cam.x,-cam.y);
  const vx0=Math.max(0,cam.x),vy0=Math.max(0,cam.y),vx1=Math.min(WPX,cam.x+W/cam.z),vy1=Math.min(WPX,cam.y+H/cam.z);
  if(vx1>vx0&&vy1>vy0)ctx.drawImage(R.terr,vx0,vy0,vx1-vx0,vy1-vy0,vx0,vy0,vx1-vx0,vy1-vy0);
@@ -932,7 +1016,7 @@ function render(){const W=cv.width,H=cv.height;ctx.fillStyle='#0a0c10';ctx.fillR
  if(R.vig)ctx.drawImage(R.vig,0,0);
  if(UI.drag&&UI.dragging){const x=Math.min(UI.drag.x,UI.mx),y=Math.min(UI.drag.y,UI.my),w=Math.abs(UI.drag.x-UI.mx),h=Math.abs(UI.drag.y-UI.my);ctx.fillStyle='rgba(125,255,122,0.12)';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#7dff7a';ctx.lineWidth=1;ctx.strokeRect(x,y,w,h)}
  if(G.paused&&!G.over&&UI.screen==='game'){ctx.fillStyle='rgba(0,0,0,0.35)';ctx.fillRect(0,0,W,H);ctx.fillStyle='#f3d98a';ctx.font='700 28px Palatino,Georgia,serif';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=8;ctx.fillText('PAUSED',W/2,H/2-80);ctx.shadowBlur=0}}
-function buildVignette(){const v=document.createElement('canvas');v.width=cv.width;v.height=cv.height;const c=v.getContext('2d');const g=c.createRadialGradient(v.width/2,v.height/2-80,Math.min(v.width,v.height)*0.35,v.width/2,v.height/2,Math.max(v.width,v.height)*0.75);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,0.45)');c.fillStyle=g;c.fillRect(0,0,v.width,v.height);R.vig=v}
+function buildVignette(){const v=document.createElement('canvas');v.width=VW;v.height=VH;const c=v.getContext('2d');const g=c.createRadialGradient(v.width/2,v.height/2-80,Math.min(v.width,v.height)*0.35,v.width/2,v.height/2,Math.max(v.width,v.height)*0.75);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,0.45)');c.fillStyle=g;c.fillRect(0,0,v.width,v.height);R.vig=v}
 
 // ===== Command / unit icons (procedural, 18-unit grid) =====
 const ICON_CACHE={};
@@ -993,7 +1077,7 @@ function renderMini(){const c=UI.mmc,S=180/N;c.imageSmoothingEnabled=false;c.dra
  for(const u of G.units){if(u.dead)continue;const tx=(u.x/TS)|0,ty=(u.y/TS)|0;if(u.team!==0&&!tileVisible(clamp(tx,0,N-1),clamp(ty,0,N-1)))continue;c.fillStyle=u.type==='scout'?'#ffe58a':u.team===0?'#8fd0ff':'#ff7a6a';c.fillRect(tx*S,ty*S,u.type==='scout'?3:2,u.type==='scout'?3:2)}
  if(G.relic){const o=G.relic.owner;c.fillStyle=o===0?'#6fe4ff':o===1?'#ff7a6a':'#d8d0f0';const rx=G.relic.x*S,ry=G.relic.y*S;c.beginPath();c.moveTo(rx,ry-4);c.lineTo(rx+4,ry);c.lineTo(rx,ry+4);c.lineTo(rx-4,ry);c.closePath();c.fill();c.strokeStyle='#000';c.lineWidth=1;c.stroke()}
  if(G.alert&&G.time-G.alert.t<8){const k=(G.time*3)%1;c.strokeStyle='rgba(255,80,50,'+(1-k)+')';c.lineWidth=2;c.beginPath();c.arc(G.alert.x/TS*S,G.alert.y/TS*S,3+k*9,0,7);c.stroke();c.fillStyle='#ff5040';c.fillRect(G.alert.x/TS*S-1.5,G.alert.y/TS*S-1.5,3,3)}
- c.strokeStyle='#fff';c.lineWidth=1;c.strokeRect(cam.x/TS*S,cam.y/TS*S,cv.width/cam.z/TS*S,cv.height/cam.z/TS*S)}
+ c.strokeStyle='#fff';c.lineWidth=1;c.strokeRect(cam.x/TS*S,cam.y/TS*S,VW/cam.z/TS*S,VH/cam.z/TS*S)}
 // ============================================================
 // UI & INPUT
 // ============================================================
@@ -1047,14 +1131,15 @@ function wouldSeal(type,tx,ty,team){const d=BLD_DEF[type];SEAL_CHECK=true;const 
 function tryPlace(){const type=UI.placing;const d=BLD_DEF[type];if(!canPlace(type,UI.ghost.x,UI.ghost.y,0)){const bl=placeBlock(type,UI.ghost.x,UI.ghost.y,0);showMsg('Cannot build here: '+(bl.length?bl[0].why+(bl.length>1?' and '+(bl.length-1)+' more tile'+(bl.length>2?'s':''):''):'blocked'));return}if(!canAfford(0,d.cost)){showMsg('Not enough resources: '+fmtCost(d.cost));return}if(type!=='gate'&&wouldSeal(type,UI.ghost.x,UI.ghost.y,0)){showMsg('Cannot build here: it would seal your base off from the map (use a Gate for walls)');SND.play(200,0.15,'square',0.04);return}
  const b=placeBuilding(0,type,UI.ghost.x,UI.ghost.y);if(!b)return;SND.play(300,0.1,'square',0.04);const [bx,by]=bldCenter(b);const vils=selEntities().filter(e=>e.kind==='u'&&e.type==='villager'&&e.team===0).sort((p,q)=>Math.hypot(p.x-bx,p.y-by)-Math.hypot(q.x-bx,q.y-by)).slice(0,2);dropAuto(vils);for(const u of vils){u.task={kind:'build',bld:b.id,resume:u.task&&u.task.kind==='gather'?u.task:null};u.path=null;u.flow=null}
  UI.placeEsc=performance.now();if(!UI.shift)UI.placing=null;updateMode()}
-function updateMode(){const m=$('mode');if(UI.placing){m.style.display='block';m.textContent='Placing '+BLD_DEF[UI.placing].name+' — click to place, Shift to keep placing, Esc to cancel'}else if(UI.mode==='amove'){m.style.display='block';m.textContent='Attack-move: click a target location (map or minimap)'}else if(UI.mode==='patrol'){m.style.display='block';m.textContent='Patrol: click the far end of the route'}else m.style.display='none'}
+function updateMode(){const m=$('mode'),t=$('mode-text');const T=IS_TOUCH;if(UI.placing){m.style.display='flex';t.textContent='Placing '+BLD_DEF[UI.placing].name+(T?(UI.ghostArmed?' — tap again to confirm':' — tap the map to position it'):' — click to place, Shift to keep placing, Esc to cancel')}else if(UI.mode==='amove'){m.style.display='flex';t.textContent='Attack-move: '+(T?'tap':'click')+' a target location (map or minimap)'}else if(UI.mode==='patrol'){m.style.display='flex';t.textContent='Patrol: '+(T?'tap':'click')+' the far end of the route'}else if(UI.mode==='box'){m.style.display='flex';t.textContent='Box select: drag across your units'}else m.style.display='none';syncTouchbar()}
+function syncTouchbar(){const tb=$('touchbar');if(!tb)return;for(const b of tb.querySelectorAll('button')){const k=b.dataset.tb;b.classList.toggle('on',(k==='box'&&UI.mode==='box')||(k==='multi'&&!!UI.touchMulti)||(k==='amove'&&UI.mode==='amove'))}}
 function hotkeyBuild(type){const d=BLD_DEF[type];if(d.age>G.teams[0].age){showMsg(d.name+' requires the '+AGES[d.age].name+' Age');return}if(!selEntities().some(e=>e.kind==='u'&&e.type==='villager'&&e.team===0)){showMsg('Select villagers to build');return}UI.placing=type;UI.mode=null;updateMode()}
 function cycleIdle(){if(!G)return;const v=G.units.filter(u=>u.team===0&&!u.dead&&u.type==='villager'&&!u.inside&&!u.task);if(!v.length){showMsg('No idle villagers');return}UI.idleI=((UI.idleI||0)%v.length);const u=v[UI.idleI++];setSel([u.id],false);centerOn(u.x,u.y)}
 function selectArmy(){if(!G)return;const ids=G.units.filter(u=>u.team===0&&!u.dead&&u.type!=='villager'&&!u.inside).map(u=>u.id);if(!ids.length){showMsg('No soldiers in the field');return}setSel(ids,false);showMsg(ids.length+' soldiers selected')}
 function refreshPanel(){const ents=selEntities();const sel=$('sel'),cmds=$('cmds');const team=G.teams[0];
  const key=ents.map(e=>e.id+(e.auto?'a':'')+(e.upg?'u':'')+(e.tier||'')+(e.open===false?'c':'')).join(',')+'|'+team.age+'|'+team.adv;
  let h='',c='';
- if(!ents.length){h='<h3>Nothing selected</h3><div class="dim">Drag to box-select units. Right-click to command.<br>Age: '+AGES[team.age].name+' · Top-6 skill avg '+avgSkill(0).toFixed(1)+' · Arms '+team.arms+'/'+armsCap(0)+'</div>';
+ if(!ents.length){h='<h3>Nothing selected</h3><div class="dim">'+(IS_TOUCH?'Tap a unit to select it. With units selected, tap where they should go or work.':'Drag to box-select units. Right-click to command.')+'<br>Age: '+AGES[team.age].name+' · Top-6 skill avg '+avgSkill(0).toFixed(1)+' · Arms '+team.arms+'/'+armsCap(0)+'</div>';
   if(team.adv>0)h+='<div style="margin-top:6px">Advancing to '+AGES[team.age+1].name+' Age… '+Math.ceil(team.adv)+'s</div>'}
  else if(ents.length===1){const e=ents[0];
   if(e.kind==='u'){const d=UNIT_DEF[e.type],s=unitStats(e);h='<h3>'+d.name+(e.team!==0?' <span class="dim">(enemy)</span>':'')+'</h3><div class="bar hp" style="width:160px"><b style="width:'+(100*e.hp/e.maxhp)+'%"></b></div><div class="dim">HP '+Math.ceil(e.hp)+'/'+e.maxhp+' · Gear: '+AGES[G.teams[e.team].age].name+' · Acc '+s.acc.toFixed(0)+' Def '+s.def.toFixed(0)+' Max hit '+s.max+'</div>';
@@ -1087,8 +1172,8 @@ function refreshPanel(){const ents=selEntities();const sel=$('sel'),cmds=$('cmds
  const t=G.teams[0].res;$('r-wood').textContent=Math.floor(t.wood);$('r-stone').textContent=Math.floor(t.stone);$('r-ore').textContent=Math.floor(t.ore);$('r-food').textContent=Math.floor(t.food);$('r-pop').textContent=G.popUsed[0]+'/'+popCap(0);{const over=G.popUsed[0]>popCap(0);$('r-pop').style.color=over?'#ff8a7a':'';if(over&&G.time-(G.popWarnT||-99)>20){G.popWarnT=G.time;showMsg('Population over the cap — training paused until you build Houses')}}$('r-age').textContent=AGES[G.teams[0].age].name+' Age'+(G.teams[0].adv>0?' ⏳':'');if(UI.ageIco!==G.teams[0].age){UI.ageIco=G.teams[0].age;drawIcon($('agecol').getContext('2d'),'age',36)}$('r-arms').textContent='Arms '+G.teams[0].arms+'/'+armsCap(0);
  {const al=$('alert');const on=G.alert&&G.time-G.alert.t<8&&!G.over;al.style.display=on?'block':'none';if(on)$('alert-where').textContent=G.alert.what}
  {const rl=$('r-relic');if(rl&&G.relic){const o=G.relic.owner;rl.style.display=o>=0?'':'none';rl.textContent=o===0?'✦ Rune Stone held':'✦ Rune Stone: enemy';rl.style.color=o===0?'var(--rune)':'#ff8a7a'}}
- {const n=G.units.filter(u=>u.team===0&&!u.dead&&u.type==='villager'&&!u.inside&&!u.task).length;const el=$('r-idle');if(el){el.textContent='Idle '+n;const pl=$('idlepill');if(pl)pl.classList.toggle('has',n>0)}}
- {const inflight=G.ai.marchArrive>G.time?G.ai.marchArrive:0;const eta=inflight||(G.ai.nextWave+waveTravel());const w=Math.max(0,eta-G.time);const el=$('r-wave');el.textContent=G.over?'':(inflight&&G.ai.atWalls)?'Enemy army at your walls '+(G.ai.comp||''):(inflight?'Army arriving ':'Next army ')+Math.floor(w/60)+':'+String(Math.floor(w%60)).padStart(2,'0')+(G.ai.comp&&inflight?' '+G.ai.comp:'');const wp=$('wavepill');if(wp){wp.classList.toggle('alarm',!!(inflight&&(G.ai.atWalls||w<15)));wp.classList.toggle('hot',!!(inflight&&!G.ai.atWalls&&w>=15))}}
+ {const n=G.units.filter(u=>u.team===0&&!u.dead&&u.type==='villager'&&!u.inside&&!u.task).length;const el=$('r-idle');if(el){el.textContent=(VW<600?'':'Idle ')+n;const pl=$('idlepill');if(pl)pl.classList.toggle('has',n>0)}}
+ {const inflight=G.ai.marchArrive>G.time?G.ai.marchArrive:0;const eta=inflight||(G.ai.nextWave+waveTravel());const w=Math.max(0,eta-G.time);const el=$('r-wave');const tstr=Math.floor(w/60)+':'+String(Math.floor(w%60)).padStart(2,'0');el.textContent=G.over?'':VW<600?((inflight&&G.ai.atWalls)?'At walls!':tstr):(inflight&&G.ai.atWalls)?'Enemy army at your walls '+(G.ai.comp||''):(inflight?'Army arriving ':'Next army ')+tstr+(G.ai.comp&&inflight?' '+G.ai.comp:'');const wp=$('wavepill');if(wp){wp.classList.toggle('alarm',!!(inflight&&(G.ai.atWalls||w<15)));wp.classList.toggle('hot',!!(inflight&&!G.ai.atWalls&&w>=15))}}
  const s=Math.floor(G.time);$('r-time').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');$('b-speed').textContent=G.speed+'x';$('b-pause').textContent=G.paused?'Resume':'Pause'}
 function doAction(act){const ents=selEntities().filter(e=>e.team===0);
  if(act.startsWith('build:'))hotkeyBuild(act.slice(6));
@@ -1114,7 +1199,7 @@ function tooltipFor(wx,wy){const u=unitAt(wx,wy);if(u){const d=UNIT_DEF[u.type];
  return null}
 const BOOT={parts:[],inited:false};
 function bootInit(){if(BOOT.inited)return;BOOT.inited=true;for(let i=0;i<96;i++)BOOT.parts.push({x:Math.random(),y:0.38+Math.random()*0.6,s:0.7+Math.random()*2.2,v:10+Math.random()*36,a:Math.random()*6.28,w:0.35+Math.random()*0.8,kind:Math.random()<0.4?1:0})}
-function renderBoot(now){bootInit();const W=cv.width,H=cv.height,t=now/1000,c=ctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;
+function renderBoot(now){bootInit();const W=VW,H=VH,t=now/1000,c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.globalAlpha=1;
  const sky=c.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#121628');sky.addColorStop(0.38,'#2e2444');sky.addColorStop(0.55,'#c47a46');sky.addColorStop(0.68,'#5a3220');sky.addColorStop(1,'#100c0a');c.fillStyle=sky;c.fillRect(0,0,W,H);
  for(let i=0;i<40;i++){const hsh=(i*97)%100/100;c.globalAlpha=0.25+0.55*Math.abs(Math.sin(t*0.4+i));c.fillStyle='#e8e0c8';c.fillRect(((hsh*W*3+t*4)%W),H*0.04+((i*53)%100)/100*H*0.28,1.4,1.4)}c.globalAlpha=1;
  const sx=W*0.74,sy=H*0.5;const glow=c.createRadialGradient(sx,sy,4,sx,sy,H*0.42);glow.addColorStop(0,'rgba(255,220,150,0.95)');glow.addColorStop(0.14,'rgba(255,140,50,0.45)');glow.addColorStop(1,'rgba(255,80,20,0)');c.fillStyle=glow;c.fillRect(0,0,W,H);
@@ -1179,6 +1264,43 @@ function resignToTitle(){autosave();showTitle()}
 function bindInput(){
  window.addEventListener('resize',resize);
  cv.addEventListener('contextmenu',e=>e.preventDefault());
+$('mode-cancel').onclick=()=>{UI.placing=null;UI.mode=null;UI.ghostArmed=false;updateMode()};
+ {const tb=$('touchbar');tb.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!G||!UI.ingame)return;const k=b.dataset.tb;SND.init();
+   if(k==='box'){UI.mode=UI.mode==='box'?null:'box';UI.placing=null;updateMode()}
+   else if(k==='multi'){UI.touchMulti=!UI.touchMulti;syncTouchbar();showMsg(UI.touchMulti?'Taps add to the selection':'Taps replace the selection')}
+   else if(k==='amove'){if(UI.mode==='amove'){UI.mode=null}else if(selEntities().some(x=>x.kind==='u'&&x.type!=='villager'&&x.team===0)){UI.mode='amove';UI.placing=null}else showMsg('Select soldiers first');updateMode()}
+   else if(k==='idle')cycleIdle();else if(k==='army')selectArmy();else if(k==='home'){if(G.alert&&G.time-G.alert.t<20)centerOn(G.alert.x,G.alert.y);else{const tc=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);if(tc){const [cx,cy]=bldCenter(tc);centerOn(cx,cy)}}}});}
+ {const TT={pts:new Map(),t0:0,x0:0,y0:0,moved:false,mode:null,pinchD:0,pinchZ:1,camX:0,camY:0,lp:null,boxStart:null};
+  const tip=(x,y)=>{const [wx,wy]=s2w(x,y);const txt=tooltipFor(wx,wy);const el=$('tip');if(txt){el.textContent=txt;el.style.display='block';el.style.left=Math.min(innerWidth-270,Math.max(4,x-120))+'px';el.style.top=Math.max(48,y-80)+'px';UI.tipSrc='touch';clearTimeout(UI.tipTO);UI.tipTO=setTimeout(()=>{if(UI.tipSrc==='touch')el.style.display='none'},2600)}};
+  const tapAt=(x,y)=>{if(!G||!UI.ingame)return;const [wx,wy]=s2w(x,y);
+   if(UI.placing){const gx=UI.ghost.x,gy=UI.ghost.y;updateGhost(wx,wy);if(UI.ghostArmed&&UI.ghost.x===gx&&UI.ghost.y===gy){tryPlace();UI.ghostArmed=false}else{UI.ghostArmed=true}updateMode();return}
+   if(UI.mode==='amove'){issueCommand(wx,wy,true);UI.mode=null;updateMode();return}
+   if(UI.mode==='patrol'){issueCommand(wx,wy,false);return}
+   const tu=unitAt(wx,wy),tb=bldAt(wx,wy);const own=selEntities().filter(e=>e.team===0&&e.kind==='u');
+   if(tu&&tu.team===0){if(UI.touchMulti&&UI.selSet.has(tu.id))setSel(UI.sel.filter(i=>i!==tu.id),false);else setSel([tu.id],!!UI.touchMulti);return}
+   if(tb&&tb.team===0&&!own.length){setSel([tb.id],false);return}
+   if(own.length){issueCommand(wx,wy,false);return}
+   if(tb){setSel([tb.id],false);return}
+   if(tu){setSel([tu.id],false);return}
+   setSel([],false)};
+  cv.addEventListener('touchstart',e=>{if(!UI.ingame)return;e.preventDefault();SND.init();MUS.start();UI.inWin=true;for(const t of e.changedTouches)TT.pts.set(t.identifier,{x:t.clientX,y:t.clientY});
+   if(TT.pts.size===1){const t=e.changedTouches[0];TT.t0=performance.now();TT.x0=t.clientX;TT.y0=t.clientY;TT.moved=false;TT.mode=UI.mode==='box'?'box':'pan';TT.camX=cam.x;TT.camY=cam.y;UI.mx=t.clientX;UI.my=t.clientY;const [wx,wy]=s2w(t.clientX,t.clientY);if(UI.placing)updateGhost(wx,wy);
+    if(TT.mode==='box'){UI.drag={x:t.clientX,y:t.clientY,wx,wy};UI.dragging=false}
+    clearTimeout(TT.lp);TT.lp=setTimeout(()=>{if(!TT.moved&&TT.pts.size===1)tip(TT.x0,TT.y0)},450)}
+   else if(TT.pts.size===2){clearTimeout(TT.lp);const [a,b]=[...TT.pts.values()];TT.pinchD=Math.hypot(a.x-b.x,a.y-b.y);TT.pinchZ=cam.z;TT.mode='pinch';UI.drag=null;UI.dragging=false}},{passive:false});
+  cv.addEventListener('touchmove',e=>{if(!UI.ingame)return;e.preventDefault();for(const t of e.changedTouches)TT.pts.set(t.identifier,{x:t.clientX,y:t.clientY});
+   if(TT.mode==='pinch'&&TT.pts.size>=2){const [a,b]=[...TT.pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;const [wx,wy]=s2w(mx,my);const nz=clamp(TT.pinchZ*d/Math.max(1,TT.pinchD),0.4,2.2);cam.z=nz;cam.x=wx-mx/nz;cam.y=wy-my/nz;clampCam();return}
+   const t=e.changedTouches[0];const dx=t.clientX-TT.x0,dy=t.clientY-TT.y0;if(!TT.moved&&Math.hypot(dx,dy)>8){TT.moved=true;clearTimeout(TT.lp)}UI.mx=t.clientX;UI.my=t.clientY;
+   if(TT.mode==='pan'&&TT.moved){cam.x=TT.camX-dx/cam.z;cam.y=TT.camY-dy/cam.z;clampCam()}
+   else if(TT.mode==='box'&&TT.moved){UI.dragging=true}},{passive:false});
+  const end=e=>{if(!UI.ingame)return;e.preventDefault();for(const t of e.changedTouches)TT.pts.delete(t.identifier);clearTimeout(TT.lp);
+   if(TT.mode==='pinch'){if(TT.pts.size===0)TT.mode=null;return}
+   if(TT.pts.size>0)return;const t=e.changedTouches[0];const dur=performance.now()-TT.t0;
+   if(TT.mode==='box'&&UI.dragging){const [ax,ay]=[UI.drag.wx,UI.drag.wy],[bx,by]=s2w(t.clientX,t.clientY);const x0=Math.min(ax,bx),x1=Math.max(ax,bx),y0=Math.min(ay,by),y1=Math.max(ay,by);const ids=[];for(const u of G.units)if(!u.dead&&!u.inside&&u.team===0&&u.x+9>=x0&&u.x-9<=x1&&u.y+9>=y0&&u.y-14<=y1)ids.push(u.id);if(ids.length)setSel(ids,!!UI.touchMulti);UI.drag=null;UI.dragging=false;UI.mode=null;updateMode();TT.mode=null;return}
+   UI.drag=null;UI.dragging=false;if(!TT.moved&&dur<600){tapAt(t.clientX,t.clientY)}TT.mode=null};
+  cv.addEventListener('touchend',end,{passive:false});cv.addEventListener('touchcancel',end,{passive:false});
+  const mm=$('mm');mm.addEventListener('touchstart',e=>{e.preventDefault();const t=e.changedTouches[0];const r=mm.getBoundingClientRect();const tx=(t.clientX-r.left)/r.width*N,ty=(t.clientY-r.top)/r.height*N;if(UI.mode==='amove'){issueCommand(tx*TS,ty*TS,true);UI.mode=null;updateMode()}else if(selEntities().some(x=>x.kind==='u'&&x.team===0)&&UI.touchMulti){issueCommand(tx*TS,ty*TS,false)}else centerOn(tx*TS,ty*TS)},{passive:false});
+  window.addEventListener('orientationchange',()=>setTimeout(resize,250));}
  cv.addEventListener('mousedown',e=>{SND.init();MUS.start();if(!UI.ingame)return;UI.shift=e.shiftKey;UI.inWin=true;UI.mx=e.clientX;UI.my=e.clientY;const [wx,wy]=s2w(e.clientX,e.clientY);updateGhost(wx,wy);
   if(e.button===0){if(UI.placing){tryPlace();return}if(UI.mode==='amove'){issueCommand(wx,wy,true);UI.mode=null;updateMode();return}UI.drag={x:e.clientX,y:e.clientY,wx,wy};UI.dragging=false}
   else if(e.button===2){if(UI.placing||UI.mode){UI.placing=null;UI.mode=null;updateMode();return}issueCommand(wx,wy,false)}});
@@ -1191,7 +1313,7 @@ function bindInput(){
    if(ids.length)setSel(ids,e.shiftKey);else if(!e.shiftKey)setSel([],false)}
   else{if(e.target!==cv)return;const u=unitAt(d.wx,d.wy);if(u){if(e.shiftKey&&UI.selSet.has(u.id)){setSel(UI.sel.filter(i=>i!==u.id),false)}else setSel([u.id],e.shiftKey&&u.team===0)}else{const b=bldAt(d.wx,d.wy);if(b)setSel([b.id],false);else if(!e.shiftKey)setSel([],false)}}
   UI.dragging=false});
- cv.addEventListener('dblclick',e=>{if(!UI.ingame||!G)return;const [wx,wy]=s2w(e.clientX,e.clientY);const u=unitAt(wx,wy);if(u&&u.team===0){const ids=[];for(const o of G.units)if(!o.dead&&o.team===0&&o.type===u.type&&Math.abs(o.x-wx)<cv.width/cam.z/2&&Math.abs(o.y-wy)<cv.height/cam.z/2)ids.push(o.id);setSel(ids,e.shiftKey)}});
+ cv.addEventListener('dblclick',e=>{if(!UI.ingame||!G)return;const [wx,wy]=s2w(e.clientX,e.clientY);const u=unitAt(wx,wy);if(u&&u.team===0){const ids=[];for(const o of G.units)if(!o.dead&&o.team===0&&o.type===u.type&&Math.abs(o.x-wx)<VW/cam.z/2&&Math.abs(o.y-wy)<VH/cam.z/2)ids.push(o.id);setSel(ids,e.shiftKey)}});
  cv.addEventListener('wheel',e=>{if(!UI.ingame)return;e.preventDefault();const [wx,wy]=s2w(e.clientX,e.clientY);let dy=e.deltaY;if(e.deltaMode===1)dy*=16;else if(e.deltaMode===2)dy*=innerHeight;const mag=Math.min(0.055,0.0007*Math.abs(dy||16));const nz=clamp(cam.z*(dy<0?1+mag:1/(1+mag)),0.4,2.2);cam.z=nz;cam.x=wx-e.clientX/nz;cam.y=wy-e.clientY/nz;clampCam()},{passive:false});
  document.addEventListener('mouseleave',()=>{UI.inWin=false});document.addEventListener('mouseenter',()=>{UI.inWin=true});
  window.addEventListener('keydown',e=>{UI.shift=e.shiftKey;const k=e.key.toLowerCase();if(UI.ingame&&!e.repeat&&!UI.keys[k]&&(k==='w'||k==='a'||k==='s'||k==='d')&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){const n=64/cam.z;if(k==='w')cam.y-=n;if(k==='s')cam.y+=n;if(k==='a')cam.x-=n;if(k==='d')cam.x+=n;clampCam()}UI.keys[k]=true;if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
@@ -1267,11 +1389,11 @@ function resDropAction(a){const [op,arg]=a.split(':');const tc=G.blds.find(b=>b.
  refreshResDrop()}
 function toggleSkills(){if(!G)return;const m=$('skills');if(m.classList.contains('show')){m.classList.remove('show');UI.screen='game'}else{if($('menu').classList.contains('show')||$('tut').classList.contains('show'))return;$('skills-body').innerHTML=skillsHtml();m.classList.add('show');UI.screen='skills'}}
 function toggleMenu(){if(!UI.ingame||!G)return;const m=$('menu');if(m.classList.contains('show')){m.classList.remove('show');if(!G.over)G.paused=false;UI.screen='game'}else{hideOvs();m.classList.add('show');G.paused=true;UI.screen='pause';$('m-note').textContent='The war waits. Save a copy, load one, or resign to the title.'}refreshPanel()}
-function centerOn(x,y){cam.x=x-cv.width/cam.z/2;cam.y=y-(cv.height-160)/cam.z/2;clampCam()}
-function clampCam(){cam.x=clamp(cam.x,-cv.width/cam.z*0.3,WPX-cv.width/cam.z*0.7);cam.y=clamp(cam.y,-cv.height/cam.z*0.3,WPX-cv.height/cam.z*0.7)}
-function resize(){cv.width=innerWidth;cv.height=innerHeight;clampCam();buildVignette()}
+function centerOn(x,y){const ph=document.body.classList.contains('narrow')?150:160;cam.x=x-VW/cam.z/2;cam.y=y-(VH-ph)/cam.z/2;clampCam()}
+function clampCam(){cam.x=clamp(cam.x,-VW/cam.z*0.3,WPX-VW/cam.z*0.7);cam.y=clamp(cam.y,-VH/cam.z*0.3,WPX-VH/cam.z*0.7)}
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);VW=innerWidth;VH=innerHeight;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);cv.style.width=VW+'px';cv.style.height=VH+'px';document.body.classList.toggle('touch',IS_TOUCH);document.body.classList.toggle('narrow',VW<900);document.body.classList.toggle('short',VH<520);clampCam();buildVignette()}
 function updateCamera(dt){const sp=520/cam.z*dt;let dx=0,dy=0;if(UI.keys['w']||UI.keys['arrowup'])dy=-1;if(UI.keys['s']||UI.keys['arrowdown'])dy=1;if(UI.keys['a']||UI.keys['arrowleft'])dx=-1;if(UI.keys['d']||UI.keys['arrowright'])dx=1;
- if(CFG.edge&&UI.inWin&&UI.ingame&&!$('menu').classList.contains('show')&&!$('tut').classList.contains('show')&&!$('settings').classList.contains('show')){const m=12;if(UI.mx<m)dx=-1;else if(UI.mx>innerWidth-m)dx=1;if(UI.my<m)dy=-1;else if(UI.my>innerHeight-m)dy=1}
+ if(CFG.edge&&UI.inWin&&UI.ingame&&!$('menu').classList.contains('show')&&!$('tut').classList.contains('show')&&!$('settings').classList.contains('show')){const m=12;if(!IS_TOUCH){if(UI.mx<m)dx=-1;else if(UI.mx>innerWidth-m)dx=1;if(UI.my<m)dy=-1;else if(UI.my>innerHeight-m)dy=1}}
  if(dx||dy){cam.x+=dx*sp;cam.y+=dy*sp;clampCam()}}
 // ============================================================
 // GAME STATE — new game, update loop, save/load, win/loss
@@ -1330,7 +1452,7 @@ function frame(now){rafPending=false;lastFrameAt=now;if(!(BG&&document.hidden))s
  if(G){const t0=performance.now();if(!G.simWin||now-G.simWin>1000){G.simWin=now;G.simUsed=0}
   try{updateCamera(dt);if(!G.paused&&!(G.over&&G.time-(G.overAt||0)>90)){const allow=Math.max(0,(G.speed||1)*1.2-(G.simUsed||0));if(allow>0){const steps=Math.min(G.speed,Math.ceil(allow/dt));for(let i=0;i<steps;i++)update(dt);G.simUsed=(G.simUsed||0)+dt*steps}}}catch(e){console.error(e)}
   UI.panelT-=dt;G.refreshT-=dt;if(G.refreshT<=0){G.refreshT=0.2;try{refreshPanel();refreshTip();if(UI.resDrop&&(G.dropT=(G.dropT||0)+1)%5===0)refreshResDrop()}catch(e){console.error(e)}}
-  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;try{render()}catch(e){ctx.setTransform(1,0,0,1,0,0);console.error(e)}G.mmT-=dt;if(G.mmT<=0){G.mmT=0.3;renderMini()}
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=1;try{render()}catch(e){ctx.setTransform(DPR,0,0,DPR,0,0);console.error(e)}G.mmT-=dt;if(G.mmT<=0){G.mmT=0.3;renderMini()}
   const spent=performance.now()-t0;if(spent>50)console.warn('slow frame',spent.toFixed(1)+'ms')}}
 initIcons();resize();bindInput();showTitle();
 {const h=(location.hash||'').slice(1);if(h==='lobby')showLobby();else if(h==='settings')showSettings('title');else if(h==='howto')openHowto(false);else if(h==='play'){CFG.tut=false;startSkirmish('rune')}else if(h==='tutorial'){startTutorial()}}

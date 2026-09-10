@@ -119,6 +119,13 @@ Top-bar pills with `data-res` (wood/stone/ore/food/pop/age/arms) open `#resdrop`
 
 CSS block "Design system v2" at the end of the stylesheet overrides earlier rules; edit there. Tokens: `--font-ui` (Palatino) for titles only, `--font-body` (system sans) for text, `--font-mono` for numbers/timers (`.num` and the top-bar value spans). One button family (`#topbar/#panel/.ov/#resdrop/#tutor button`, 28px) with variants `.primary` (gold, key action), `.danger` (red), `.on` (rune cyan, active state), `.locked`. The command card `#cmds` is a 4-column grid of 56px icon tiles: `btn()` in `refreshPanel` emits `<canvas class="cico" data-ico>` + `.lbl` + `.k` hotkey badge; `iconFor(act)` maps actions to icon kinds; `drawCmdIcon` draws every building/unit/action glyph on an 18-unit grid; `iconImg` caches offscreen canvases; `paintIcons(root)` fills any `canvas.cico`. Selection cards group by type with a count badge and mean-HP bar (`data-type`; click isolates, shift-click removes). Top-bar Idle and Next army are `.res.stat` pills with `.has` / `.hot` / `.alarm` states.
 
+## Mobile / touch
+
+- Canvas is DPR-scaled: backing store `VW*DPR × VH*DPR`, CSS size `VW×VH`; `frame` and `renderBoot` call `ctx.setTransform(DPR,…)`. Use `VW`/`VH` for screen-space math, never `cv.width`.
+- `IS_TOUCH` (coarse pointer, or `?touch=1` for desktop testing) adds `body.touch`; `resize()` also sets `body.narrow` (<900px) and `body.short` (<520px). Breakpoints: 900px (compact bar, two-row panel with a horizontally scrolling command strip), 600px (portrait: Arms/speed/pause hidden, Idle/army pills show bare numbers, Menu pinned), 520px height (landscape phones: toolbar moves above the panel).
+- Touch handlers live in `bindInput` (the `TT` block): tap = select own unit/building, or issue the right-click command when own units are selected; one-finger drag pans; two fingers pinch-zoom around the midpoint; hold 450ms shows the tooltip for ~2.6s; `UI.mode==='box'` makes a drag box-select. `#touchbar` (box, multi/shift, attack-move, idle, army, home) shows only on `body.touch.play`. Placement on touch is two taps (`UI.ghostArmed`); `#mode` has a Cancel button.
+- Edge scrolling is off on touch. `mobiletest.html` (git-ignored) embeds the game in 844×390 and 390×700 frames for testing; frame-scoped `let` state must be read via `contentWindow.eval`.
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
