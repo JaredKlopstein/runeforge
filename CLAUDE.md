@@ -145,6 +145,10 @@ CSS block "Design system v2" at the end of the stylesheet overrides earlier rule
 
 After terrain noise and the road, `genWorld` runs a thinning pass before nodes are created: a clearing noise (`n1`/`n3`, threshold 0.38) turns resource tiles more than 19 tiles from a start back to grass, then a 4-connected flood fill finds every forest/stone/ore component; any component over 18 tiles or wider/taller than 6 gets grass lanes every 5 tiles (random offset per component) along its long axis, both axes if over 60 tiles, never within 14 tiles of a start. Typical result: ~1750 nodes (was ~3000), largest cluster under 80 tiles (was 400–1350), walkable area up ~30%. Test harness pattern: extract `genWorld` with node and count components/reach.
 
+## Exhaustible mines
+
+`depleteNode(n,def,team)` runs whenever a node hits 0. `exhaustible(n)` is stone/ore with `tier<3`. `n.dep` counts depletions; `EXHAUST_P=[0,0,0.3,0.6,1]` indexed by `dep` gives the chance the vein ends for good, decided by a hash of node index, `dep` and `G.seedNum` (deterministic per seed). Exhausted nodes get `n.ex=true`, `regrow=0`, stay `amt=0` (so `pass` and `findNode` already treat them as gone), draw as 55%-alpha rubble, tooltip "Exhausted for good"; the owner sees a toast plus an "Exhausted" float when the tile is visible. Stone/Ore dropdowns show "N ran dry · M low-tier left". Saves store `[amt, regrow, dep, ex]` per node (older 2-field rows load fine). Wood, fish and tier 3–4 veins are always renewable. Low-tier stone/ore `amt` was raised ~15% to compensate.
+
 ## What's New screen
 
 `VERSION`, `CHANGELOG` (newest first: `{v,d,t,items[]}`) and `ROADMAP` (`{t,n,soon?}`) live just above `toggleSkills`. `showNews(fromGame)` renders `#news` (title button `#b-news`, pause-menu `#m-news`, hash `#news`), marks `runeforge_seen_ver`, and `refreshNewsDot` shows the cyan dot on the title button until the current version has been opened. **Bump `VERSION` and add a `CHANGELOG` entry with every user-visible change.**

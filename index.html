@@ -440,8 +440,8 @@ const TEAM_DARK=['#1f4f80','#7a2418'];
 const RES_COL={wood:'#8b5a2b',stone:'#9aa0a6',ore:'#d97b2f',food:'#e0524f'};
 const NODE_DEF={
  wood:[{name:'Tree',lvl:1,xp:12,yield:2,amt:110,regrow:70},{name:'Oak',lvl:10,xp:26,yield:3,amt:170,regrow:100},{name:'Willow',lvl:20,xp:45,yield:4,amt:220,regrow:120},{name:'Yew',lvl:30,xp:70,yield:5,amt:280,regrow:140},{name:'Magic tree',lvl:45,xp:110,yield:7,amt:340,regrow:170}],
- stone:[{name:'Rock',lvl:1,xp:12,yield:2,amt:110,regrow:80},{name:'Granite',lvl:10,xp:26,yield:3,amt:170,regrow:110},{name:'Marble',lvl:20,xp:45,yield:4,amt:220,regrow:130},{name:'Obsidian',lvl:30,xp:70,yield:5,amt:280,regrow:150},{name:'Adamant rock',lvl:45,xp:110,yield:7,amt:340,regrow:180}],
- ore:[{name:'Copper vein',lvl:1,xp:14,yield:2,amt:90,regrow:90},{name:'Iron vein',lvl:10,xp:30,yield:3,amt:150,regrow:120},{name:'Mithril vein',lvl:20,xp:50,yield:4,amt:190,regrow:140},{name:'Adamantite vein',lvl:30,xp:78,yield:5,amt:230,regrow:160},{name:'Runite vein',lvl:45,xp:120,yield:7,amt:280,regrow:190}],
+ stone:[{name:'Rock',lvl:1,xp:12,yield:2,amt:125,regrow:80},{name:'Granite',lvl:10,xp:26,yield:3,amt:195,regrow:110},{name:'Marble',lvl:20,xp:45,yield:4,amt:250,regrow:130},{name:'Obsidian',lvl:30,xp:70,yield:5,amt:280,regrow:150},{name:'Adamant rock',lvl:45,xp:110,yield:7,amt:340,regrow:180}],
+ ore:[{name:'Copper vein',lvl:1,xp:14,yield:2,amt:105,regrow:90},{name:'Iron vein',lvl:10,xp:30,yield:3,amt:170,regrow:120},{name:'Mithril vein',lvl:20,xp:50,yield:4,amt:215,regrow:140},{name:'Adamantite vein',lvl:30,xp:78,yield:5,amt:230,regrow:160},{name:'Runite vein',lvl:45,xp:120,yield:7,amt:280,regrow:190}],
  food:[{name:'Shrimp',lvl:1,xp:12,yield:2,amt:140,regrow:50},{name:'Trout',lvl:10,xp:26,yield:3,amt:210,regrow:70},{name:'Lobster',lvl:20,xp:45,yield:4,amt:260,regrow:85},{name:'Swordfish',lvl:30,xp:70,yield:5,amt:320,regrow:100},{name:'Shark',lvl:45,xp:110,yield:7,amt:380,regrow:120}]};
 const NODE_SKILL={wood:'wc',stone:'mi',ore:'mi',food:'fi'};
 const CARRY_CAP=8, GATHER_T=1.6;
@@ -538,6 +538,13 @@ function genWorld(seedStr){
    if(land){const near=dStart(x,y)<13;if(rng()<(near?0.75:0.3))addNode(x,y,'food',tierN[i])}}}
  return {T,nodes,nodeAt};
 }
+const EXHAUST_P=[0,0,0.3,0.6,1];
+function exhaustible(n){return (n.type==='stone'||n.type==='ore')&&n.tier<3}
+function depleteNode(n,def,team){n.dep=(n.dep||0)+1;let ex=false;
+ if(exhaustible(n)){const p=EXHAUST_P[Math.min(n.dep,EXHAUST_P.length-1)];const h=((n.i*2654435761+n.dep*40503+(G.seedNum||0))>>>0)%1000/1000;ex=h<p}
+ if(ex){n.ex=true;n.regrow=0;if(team===0&&G.visible[n.x+n.y*N]){showMsg(def.name+' has run dry for good');addFloat&&addFloat(n.x*TS+16,n.y*TS,'Exhausted','#d9a066')}}
+ else n.regrow=def.regrow;
+ R.redrawTile(n.x,n.y);invalidatePaths()}
 let PASS_TEAM=0;
 function gateWalkable(b,team){return b&&b.type==='gate'&&(b.built||SEAL_CHECK)&&!b.dead&&b.open!==false&&b.team===team}
 let SEAL_CHECK=false;
@@ -652,7 +659,7 @@ function gatherStep(u,t,dt){const team=G.teams[u.team];
  if(r==='moving'){followPath(u,dt);u.cool=GATHER_T}
  else if(r==='arrived'){u.working=true;u.dir=Math.atan2(n.y*TS+16-u.y,n.x*TS+16-u.x);u.cool-=dt*skillMult(u.lv[sk]);
   if(u.cool<=0){u.cool=GATHER_T;const got=Math.min(def.yield,n.amt);n.amt-=got;u.carry=n.type;u.carryAmt+=got;addXp(u,sk,def.xp);emitGather(u,n);if(u.team===0&&SND.n<3)SND.play(n.type==='wood'?180:n.type==='food'?520:240,0.06,n.type==='food'?'sine':'square',0.025);
-   if(n.amt<=0){n.regrow=def.regrow;R.redrawTile(n.x,n.y);invalidatePaths()}}}
+   if(n.amt<=0){depleteNode(n,def,u.team)}}}
  else if(r==='fail'){const alt=findNode(n.type,u.x,u.y,u.lv[sk],22);if(alt&&alt.i!==n.i)t.node=alt.i;else u.task=null}}
 function buildStep(u,t,dt){const b=G.byId.get(t.bld);if(!b||b.dead){u.task=null;return}
  if(b.built&&!b.upg&&b.hp>=b.maxhp){u.task=null;return}
@@ -889,7 +896,7 @@ const R={terr:null,tctx:null,fogC:null,fogCtx:null,fogData:null,mmBase:null,
    else if(n.tier===3){const tri=(y0,w,hh,col,col2)=>{c.fillStyle=col;c.beginPath();c.moveTo(0,y0-hh);c.lineTo(w,y0);c.lineTo(-w,y0);c.closePath();c.fill();c.fillStyle=col2;c.beginPath();c.moveTo(0,y0-hh);c.lineTo(-w*0.15,y0);c.lineTo(-w,y0);c.closePath();c.fill()};tri(7,13,14,'#143828','#1e4e34');tri(0,10.5,12,'#1c4a37','#2d6e4c');tri(-6,7.5,11,'#246048','#3d8a62');c.fillStyle='#d23c3c';c.beginPath();c.arc(-5,1,1.4,0,7);c.arc(5,-2,1.3,0,7);c.arc(-1,-7,1.2,0,7);c.fill()}
    else{c.fillStyle='rgba(140,100,255,0.28)';c.beginPath();c.arc(0,-4,15,0,7);c.fill();const tri=(y0,w,hh,col,col2)=>{c.fillStyle=col;c.beginPath();c.moveTo(0,y0-hh);c.lineTo(w,y0);c.lineTo(-w,y0);c.closePath();c.fill();c.fillStyle=col2;c.beginPath();c.moveTo(0,y0-hh);c.lineTo(-w,y0);c.lineTo(0,y0);c.closePath();c.fill()};tri(6,12,13,'#2a1f4a','#3d2f6a');tri(-1,10,12,'#3d2f6a','#5a4a9a');tri(-8,7,11,'#5a4a9a','#8a78c8');c.fillStyle='#e8d8ff';[[-5,1],[5,-3],[-1,-9],[3,3]].forEach(([a,b])=>{c.fillRect(a,b,2.2,2.2)});c.fillStyle='rgba(200,180,255,0.7)';c.beginPath();c.arc(0,-16,1.6,0,7);c.fill()}
    c.restore()}
-  else if(n.type==='stone'){if(n.amt<=0){c.fillStyle='rgba(0,0,0,0.16)';c.beginPath();c.ellipse(cx,cy+8,10,3.4,0,0,7);c.fill();c.fillStyle='#7a7f84';c.fillRect(cx-8,cy+2,6,5);c.fillRect(cx+1,cy,7,6);c.fillStyle='#b0b4b8';c.fillRect(cx-8,cy+2,6,1.6);c.fillRect(cx+1,cy,7,1.6);return}
+  else if(n.type==='stone'){if(n.amt<=0){if(n.ex){c.globalAlpha=0.55}c.fillStyle='rgba(0,0,0,0.16)';c.beginPath();c.ellipse(cx,cy+8,10,3.4,0,0,7);c.fill();c.fillStyle='#7a7f84';c.fillRect(cx-8,cy+2,6,5);c.fillRect(cx+1,cy,7,6);c.fillStyle='#b0b4b8';c.fillRect(cx-8,cy+2,6,1.6);c.fillRect(cx+1,cy,7,1.6);c.globalAlpha=1;return}
    const PAL=[['#8a8f94','#5c6167','#c4c8cc'],['#b0b4ba','#767b82','#e0e3e8'],['#d8d0d8','#9a90a0','#f4eef6'],['#2e2a33','#141218','#6a6270'],['#3f9a5a','#1e5a34','#b8ffd0']];const [col,dark,lite]=PAL[n.tier];
    if(n.tier>=3){const gr=c.createRadialGradient(cx,cy,2,cx,cy,18);gr.addColorStop(0,n.tier===4?'rgba(120,255,160,0.4)':'rgba(180,180,220,0.28)');gr.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gr;c.fillRect(px,py,TS,TS)}
    c.fillStyle='rgba(0,0,0,0.32)';c.beginPath();c.ellipse(cx+1,cy+11,13,4.6,0,0,7);c.fill();
@@ -899,7 +906,7 @@ const R={terr:null,tctx:null,fogC:null,fogCtx:null,fogData:null,mmBase:null,
    if(n.tier===2){c.strokeStyle='#d98fb0';c.lineWidth=1.3;c.beginPath();c.moveTo(cx-7,cy);c.lineTo(cx-1,cy+5);c.moveTo(cx+3,cy-4);c.lineTo(cx+7,cy+3);c.stroke()}
    if(n.tier===3){c.fillStyle='rgba(255,255,255,0.45)';c.beginPath();c.moveTo(cx-6,cy-6);c.lineTo(cx-2,cy-9);c.lineTo(cx,cy-1);c.closePath();c.fill()}
    if(n.tier===4){crystal(cx-3,cy-2,7,'#b8ffd0');crystal(cx+5,cy+2,5,'#7ae0a0')}}
-  else if(n.type==='ore'){if(n.amt<=0){c.fillStyle='rgba(0,0,0,0.16)';c.beginPath();c.ellipse(cx,cy+8,10,3.4,0,0,7);c.fill();c.fillStyle='#3a3e46';c.fillRect(cx-7,cy+1,13,7);c.fillStyle='#5a6068';c.fillRect(cx-7,cy+1,13,1.8);return}
+  else if(n.type==='ore'){if(n.amt<=0){if(n.ex){c.globalAlpha=0.55}c.fillStyle='rgba(0,0,0,0.16)';c.beginPath();c.ellipse(cx,cy+8,10,3.4,0,0,7);c.fill();c.fillStyle='#3a3e46';c.fillRect(cx-7,cy+1,13,7);c.fillStyle='#5a6068';c.fillRect(cx-7,cy+1,13,1.8);c.globalAlpha=1;return}
    const GL=['#e0822f','#c3ced8','#5f7fe8','#3fbf6a','#3fd6ff'];const glow=['rgba(224,130,47,0.0)','rgba(195,206,216,0.28)','rgba(95,127,232,0.4)','rgba(63,191,106,0.42)','rgba(63,214,255,0.5)'];
    if(n.tier>=1){const gr=c.createRadialGradient(cx,cy,2,cx,cy,17);gr.addColorStop(0,glow[n.tier]);gr.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gr;c.fillRect(px,py,TS,TS)}
    c.fillStyle='rgba(0,0,0,0.32)';c.beginPath();c.ellipse(cx,cy+11,13,4.6,0,0,7);c.fill();
@@ -1264,7 +1271,7 @@ function doAction(act){const ents=selEntities().filter(e=>e.team===0);
  UI.lastSelKey='';refreshPanel()}
 function tooltipFor(wx,wy){const u=unitAt(wx,wy);if(u){const d=UNIT_DEF[u.type];let best='cb',bl=0;for(const s of SKILLS)if(u.lv[s]>bl){bl=u.lv[s];best=s}return d.name+(u.team?' (enemy)':'')+'\nHP '+Math.ceil(u.hp)+'/'+u.maxhp+' · Combat '+u.lv.cb+' · Best: '+SKILL_NAME[best]+' '+bl}
  const b=bldAt(wx,wy);if(b){const d=BLD_DEF[b.type];return bname(b)+(b.team?' (enemy)':'')+'\nHP '+Math.ceil(b.hp)+'/'+b.maxhp+(b.built?'':' · '+Math.floor(b.prog*100)+'% built')+(b.upg?' · upgrading '+Math.floor(b.upg.prog*100)+'%':'')+(b.type==='gate'?'\n'+(b.open!==false?'Open to your units':'Locked') :'')+'\n'+d.desc+(b.team===0&&b.built&&b.hp<b.maxhp-1&&!b.upg?'\nRight-click with villagers to repair':'')}
- const n=nodeAtW(wx,wy);if(n){const d=NODE_DEF[n.type][n.tier];return d.name+' ('+n.type+')\n'+(n.amt>0?n.amt+'/'+n.max+' left':'Depleted, regrowing '+Math.ceil(n.regrow)+'s')+'\nRequires '+SKILL_NAME[NODE_SKILL[n.type]]+' '+d.lvl+' · '+d.xp+' XP · '+d.yield+' per swing'}
+ const n=nodeAtW(wx,wy);if(n){const d=NODE_DEF[n.type][n.tier];return d.name+' ('+n.type+')\n'+(n.amt>0?n.amt+'/'+n.max+' left'+(exhaustible(n)&&n.dep?' · worked '+n.dep+'×, may run dry':''):n.ex?'Exhausted for good':'Depleted, regrowing '+Math.ceil(n.regrow)+'s')+'\nRequires '+SKILL_NAME[NODE_SKILL[n.type]]+' '+d.lvl+' · '+d.xp+' XP · '+d.yield+' per swing'}
  return null}
 const BOOT={parts:[],inited:false};
 function bootInit(){if(BOOT.inited)return;BOOT.inited=true;for(let i=0;i<96;i++)BOOT.parts.push({x:Math.random(),y:0.38+Math.random()*0.6,s:0.7+Math.random()*2.2,v:10+Math.random()*36,a:Math.random()*6.28,w:0.35+Math.random()*0.8,kind:Math.random()<0.4?1:0})}
@@ -1446,8 +1453,9 @@ function resDropHtml(k){const team=G.teams[0],res=team.res;const vils=G.units.fi
  if(k==='wood'||k==='stone'||k==='ore'||k==='food'){const sk=NODE_SKILL[k];const workers=vils.filter(u=>u.task&&((u.task.kind==='gather'&&u.task.node>=0&&G.nodes[u.task.node].type===k)||(k==='food'&&u.task.kind==='farm')));const tiers={};for(const u of workers){const n=u.task.kind==='farm'?'Farm':NODE_DEF[k][G.nodes[u.task.node].tier].name;tiers[n]=(tiers[n]||0)+1}
   let soon='';{const per={};for(const u of workers){if(u.task.kind!=='gather')continue;const n=G.nodes[u.task.node];per[n.i]=per[n.i]||{n,w:0,rate:0};per[n.i].w++;per[n.i].rate+=NODE_DEF[k][n.tier].yield*skillMult(u.lv[sk])/GATHER_T}let worst=null;for(const id in per){const e=per[id];const t=e.n.amt/Math.max(0.01,e.rate);if(!worst||t<worst.t)worst={t,e}}if(worst)soon=NODE_DEF[k][worst.e.n.tier].name+' ('+worst.e.w+' working) empties in ~'+fmtT(worst.t)}
   let best=1;for(const u of vils)if(u.lv[sk]>best)best=u.lv[sk];let bestTier=0;for(let i=0;i<NODE_DEF[k].length;i++)if(NODE_DEF[k][i].lvl<=best)bestTier=i;const nextT=NODE_DEF[k][bestTier+1];
+  let exh='';if(k==='stone'||k==='ore'){let e=0,live=0;for(const n of G.nodes){if(n.type!==k||!exhaustible(n))continue;if(n.ex)e++;else live++}if(e)exh=e+' ran dry · '+live+' low-tier left (deep veins near the center never run dry)'}
   let need='';if(team.age<2){const a=AGES[team.age+1];if(a.cost[k]&&res[k]<a.cost[k])need=a.name+' Age needs '+(a.cost[k]-Math.floor(res[k]))+' more'}
-  let h='<h4>'+SKILL_NAME[sk]+' · '+k.charAt(0).toUpperCase()+k.slice(1)+'</h4><div class="kv"><span>Stock</span><span>'+Math.floor(res[k])+'</span><span>Income</span>'+inc(k)+'<span>Gatherers</span><span>'+(workers.length?Object.entries(tiers).map(([n,c])=>c+' on '+n).join(', '):'<span class="warn">none</span>')+'</span><span>Best skill</span><span>'+best+' ('+NODE_DEF[k][bestTier].name+(nextT?', '+nextT.name+' at '+nextT.lvl:'')+')</span>'+(soon?'<span>Running out</span><span class="warn">'+soon+'</span>':'')+(need?'<span>Needed</span><span class="warn">'+need+'</span>':'')+'</div>';
+  let h='<h4>'+SKILL_NAME[sk]+' · '+k.charAt(0).toUpperCase()+k.slice(1)+'</h4><div class="kv"><span>Stock</span><span>'+Math.floor(res[k])+'</span><span>Income</span>'+inc(k)+'<span>Gatherers</span><span>'+(workers.length?Object.entries(tiers).map(([n,c])=>c+' on '+n).join(', '):'<span class="warn">none</span>')+'</span><span>Best skill</span><span>'+best+' ('+NODE_DEF[k][bestTier].name+(nextT?', '+nextT.name+' at '+nextT.lvl:'')+')</span>'+(soon?'<span>Running out</span><span class="warn">'+soon+'</span>':'')+(need?'<span>Needed</span><span class="warn">'+need+'</span>':'')+(exh?'<span>Exhausted</span><span class="warn">'+exh+'</span>':'')+'</div>';
   h+='<div class="acts">'+btn('send:'+k,'Send a villager','Send the nearest idle villager (or one from your richest resource) to gather '+k)+btn('goto:'+k,'Find best node','Jump the camera to the best '+k+' node your top gatherer can use')+(k==='food'?btn('build:farm','Place Farm','Place a Farm (J) with the nearest villager'):btn('build:store','Place Storehouse','Place a Storehouse (E) with the nearest villager to shorten hauls'))+'</div>';return h}
  if(k==='pop'){const cap=popCap(0),used=G.popUsed[0];let queued=0;for(const b of G.blds)if(b.team===0&&!b.dead)queued+=b.queue.length;const houses=G.blds.filter(b=>b.team===0&&!b.dead&&b.type==='house');const tc=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);
   let h='<h4>Population</h4><div class="kv"><span>Used / cap</span><span class="'+(used>=cap?'bad':used>=cap-2?'warn':'')+'">'+used+' / '+cap+(cap>=POP_MAX?' (max)':'')+'</span><span>Queued</span><span>'+queued+'</span><span>Houses</span><span>'+(houses.length?houses.length+' (+'+houses.reduce((a,b)=>a+(b.built?bdef(b).pop:0),0)+' pop'+(houses.some(b=>b.tier>0)?', '+houses.filter(b=>b.tier>0).length+' upgraded':'')+')':'none yet')+'</span><span>Town Center</span><span>'+(tc?'+'+bdef(tc).pop+' pop ('+bname(tc)+')':'—')+'</span></div>';
@@ -1472,8 +1480,9 @@ function resDropAction(a){const [op,arg]=a.split(':');const tc=G.blds.find(b=>b.
  else if(op==='army'){if(arg==='select')selectArmy();else if(arg==='train'){const bk=G.blds.find(b=>b.team===0&&b.type==='barracks'&&b.built&&!b.dead);if(!bk){showMsg('Build a Barracks first');return}setSel([bk.id],false);doAction('train:guard')}else if(arg==='home'){const tc2=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);const mil=G.units.filter(u=>u.team===0&&!u.dead&&u.type!=='villager'&&!u.inside);if(tc2&&mil.length){const [cx,cy]=bldCenter(tc2);cmdMove(mil,cx,cy+120,false);showMsg('Army returning home')}}}
  else if(op==='smith'){const forge=G.blds.find(b=>b.team===0&&!b.dead&&b.type==='forge'&&b.built);const u=forge&&nearestVillager(...bldCenter(forge));if(!u){showMsg('No villager available');return}dropAuto([u]);u.task={kind:'smith',bld:forge.id};u.orders=null;u.path=null;u.flow=null;setSel([u.id],false);showMsg('Villager sent to smith')}
  refreshResDrop()}
-const VERSION='0.9.2';
+const VERSION='0.9.3';
 const CHANGELOG=[
+ {v:'0.9.3',d:'2026-09-10',t:'Scarcer mines',items:['Rocks and ore veins below Obsidian / Adamantite can run dry for good: the first depletion always regrows, the second has a 30% chance to end the vein, the third 60%, the fourth always','Trees, fish and the deep veins near the map center are renewable, so the Rune Stone area is the long-game prize','A toast and a float mark a vein running dry; the tooltip shows how many times a vein has been worked; the Stone and Ore dropdowns count exhausted veins','Low-tier rock and ore hold about 15% more to offset the thinner map']},
  {v:'0.9.2',d:'2026-09-10',t:'Thinner resource clusters',items:['Woods and quarries are broken into small groves and outcrops with natural clearings','Lanes are carved through any cluster wider than about five tiles, so villagers and armies walk through instead of around','Roughly 40% fewer resource tiles, but the largest block shrank from hundreds of tiles to under eighty and most nodes now have a walkable side']},
  {v:'0.9.1',d:'2026-09-10',t:'Open start areas',items:['Guaranteed clearing around each Town Center grown to 11 tiles; resource patches moved to its rim','Two extra exit corridors carved from every base so no start has a single choke','The enemy no longer walls itself in: its builder avoids road tiles and self-sealing spots, and demolishes a building if its base ever gets choked','Placement warns in orange when a spot would narrow your exit and refuses spots that would seal you in']},
  {v:'0.9.0',d:'2026-09-10',t:'Mobile and a sixth round of fixes',items:['Touch play: tap to select and command, drag to pan, pinch to zoom, hold for tooltips, a floating toolbar, two-tap building placement','Phone layouts for the top bar, bottom panel, dialogs and the tutorial','Drag to draw palisade lines; every foundation now claims a builder; sealed / open feedback after walling','Army pill with your soldiers versus the next wave; income shown as gathered versus spent','Esc always cancels placement, Patrol takes a left-click, Idle picks villagers only, "Send a villager" spares your specialists','Lord toned down: smaller home garrison before Iron, Iron Age costs 200 stone, Towers available in Bronze, 400 starting food']},
@@ -1486,8 +1495,7 @@ const CHANGELOG=[
  {v:'0.2.0',d:'2026-09-09',t:'Auto villagers and a visual pass',items:['Auto mode: villagers haul, build, smith, and gather whatever you are short on','Procedural terrain, node, unit and building art with particles and a vignette']},
  {v:'0.1.0',d:'2026-09-09',t:'First playable',items:['96×96 seeded world with fog, six RuneScape-style skills, four resources, seven buildings, three ages','Tick-based combat, four unit types, an AI opponent that runs the same economy, save and load']}];
 const ROADMAP=[
- {t:'Scarcer mines',n:'Rocks and ore veins that can run dry for good after a few passes, so bases must expand outward',soon:true},
- {t:'A Bronze-age counter unit',n:'Something to trade up with before Rangers and Rams'},
+ {t:'A Bronze-age counter unit',n:'Something to trade up with before Rangers and Rams',soon:true},
  {t:'Replays',n:'Record a match as commands and watch it back; the groundwork for multiplayer'},
  {t:'Two-player matches',n:'Deterministic lockstep over a data channel, host-and-join by room code'},
  {t:'More maps',n:'Map styles beyond the diagonal road: islands, a river crossing, a central plateau'},
@@ -1541,7 +1549,7 @@ function unpackBits(str,a){const s=atob(str);for(let i=0;i<s.length;i++){const v
 function saveGame(){const st={v:1,diff:CFG.diff,tutorial:G.tutorial?{i:G.tutorial.i}:null,seed:G.seed,time:G.time,ct:G.ct,nextId:G.nextId,teams:G.teams,ai:G.ai,speed:G.speed,over:G.over,
  units:G.units.filter(u=>!u.dead).map(u=>({id:u.id,team:u.team,type:u.type,x:Math.round(u.x),y:Math.round(u.y),hp:u.hp,skills:u.skills,task:u.task,carry:u.carry,carryAmt:u.carryAmt,acool:u.acool,auto:u.auto,inside:u.inside||0,manualG:!!u.manualG})),
  blds:G.blds.filter(b=>!b.dead).map(b=>({id:b.id,team:b.team,type:b.type,tx:b.tx,ty:b.ty,hp:b.hp,built:b.built,prog:b.prog,queue:b.queue,rally:b.rally,tier:b.tier,upg:b.upg,open:b.open})),
- nodes:G.nodes.map(n=>[n.amt,Math.round(n.regrow)]),explored:packBits(G.explored),exploredE:packBits(G.exploredE),cam:{x:cam.x,y:cam.y,z:cam.z},groups:UI.groups};
+ nodes:G.nodes.map(n=>[n.amt,Math.round(n.regrow),n.dep||0,n.ex?1:0]),explored:packBits(G.explored),exploredE:packBits(G.exploredE),cam:{x:cam.x,y:cam.y,z:cam.z},groups:UI.groups};
  return JSON.stringify(st)}
 function loadGame(txt){const st=JSON.parse(txt);if(!st||st.v!==1||typeof st.seed!=='string')throw new Error('not a Runeforge save');
  if(typeof st.diff==='number'&&DIFF[st.diff]){CFG.diff=st.diff}initWorld(st.seed);G.time=st.time||0;G.ct=st.ct||0;G.speed=st.speed||1;G.over=st.over||null;G.ai=Object.assign(G.ai,st.ai||{});
@@ -1549,7 +1557,7 @@ function loadGame(txt){const st=JSON.parse(txt);if(!st||st.v!==1||typeof st.seed
  for(const b of st.blds){G.nextId=b.id;const nb=mkBld(b.team,b.type,b.tx,b.ty,b.built);nb.tier=b.tier||0;nb.upg=b.upg||null;nb.maxhp=bdef(nb).hp;nb.hp=Math.min(b.hp,nb.maxhp);nb.prog=b.prog;nb.built=b.built;nb.queue=b.queue||[];nb.rally=b.rally||null;if(b.type==='gate')nb.open=b.open!==false}
  for(const u of st.units){G.nextId=u.id;const nu=mkUnit(u.team,u.type,u.x,u.y);nu.skills=Object.assign(nu.skills,u.skills||{});for(const s of SKILLS)nu.lv[s]=lvlOf(nu.skills[s]);nu.maxhp=UNIT_DEF[u.type].hp+(u.type==='villager'?0:nu.lv.cb*2);nu.hp=Math.min(u.hp,nu.maxhp);nu.task=u.task||null;nu.carry=u.carry||null;nu.carryAmt=u.carryAmt||0;nu.acool=u.acool||0;nu.auto=!!u.auto;nu.inside=u.inside||0;nu.manualG=!!u.manualG;
   if(nu.task&&(nu.task.kind==='move'||nu.task.kind==='attackmove')&&nu.task.tx!==undefined){nu.flow=null}}
- G.nextId=Math.max(st.nextId||1,G.nextId+1);for(let i=0;i<G.nodes.length&&i<st.nodes.length;i++){const n=G.nodes[i];n.amt=st.nodes[i][0];n.regrow=st.nodes[i][1];if(n.amt<=0)R.redrawTile(n.x,n.y)}
+ G.nextId=Math.max(st.nextId||1,G.nextId+1);for(let i=0;i<G.nodes.length&&i<st.nodes.length;i++){const n=G.nodes[i];n.amt=st.nodes[i][0];n.regrow=st.nodes[i][1];n.dep=st.nodes[i][2]||0;n.ex=!!st.nodes[i][3];if(n.amt<=0)R.redrawTile(n.x,n.y)}
  if(st.tutorial&&typeof st.tutorial.i==='number')G.tutorial={i:st.tutorial.i,shown:st.tutorial.i,t:0};if(st.explored)unpackBits(st.explored,G.explored);if(st.exploredE)unpackBits(st.exploredE,G.exploredE);UI.groups=st.groups||{};if(st.cam){cam.x=st.cam.x;cam.y=st.cam.y;cam.z=st.cam.z;clampCam()}
  G.popUsed=[popUsed(0),popUsed(1)];invalidatePaths();updateVision();R.buildMini();for(const n of G.nodes)if(n.amt<=0)R.redrawTile(n.x,n.y);setSel([],false);renderMini();showMsg('Game loaded')}
 let last=performance.now(),lastFrameAt=performance.now(),rafPending=false;
