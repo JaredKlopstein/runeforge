@@ -85,6 +85,18 @@ If `!UI.ingame`, only `renderBoot`. Else update + `render`. Worker (`bg=1`) call
 4. Art pass: terrain, nodes, units, buildings, HUD icons (still Canvas, no bitmaps).
 5. Gates, scouts, farms, rams, rune stone, queues, patrol, stances, idle/army hotkeys, wall autotile, scout reports, wave composition, end stats, slower zoom.
 
+## Round-four fixes (Claude, after the Grok handoff)
+
+- **Siege fallback**: an attack-move that cannot path (`flowStep`/`setGoal` fail) calls `siegeFallback(u,t)`, which A*-checks the nearest enemy buildings (walls and gates included) and attacks the first reachable one with `resume` set to the march. Throttled by `u.siegeT`.
+- **Honest army ETA**: `aiThink` recomputes `ai.marchArrive` from the actual lead marching unit each think and clears it when nobody is marching.
+- **Enemy scouting**: `pickScoutTile` uses the unit's own explored map; team-1 scouts always auto-explore. A wave whose target TC is unknown sends the scout toward the player's start and delays 30s, up to three times (`ai.scoutWait`).
+- **AI contests the Rune Stone** from the Iron Age with three idle soldiers every two minutes.
+- **Seal guard**: `wouldSeal(type,tx,ty,team)` flood-fills reachable tiles from the TC before/after a temporary footprint; `tryPlace` refuses anything but a gate that cuts reach below 60%.
+- **Saves**: `SAVE_KEY` is `runeforge_save` plus `_<tester|profile>` from the query string; the meta stores `diff`, the save body stores `diff`, and the Continue button shows difficulty, seed, time and age.
+- Upgrades auto-recruit up to two qualified villagers; placement takes the two nearest selected villagers; a finished builder moves to another unfinished foundation within 12 tiles before resuming.
+- Stances are two lit buttons (`stance:aggro` / `stance:hold`). Box-select uses unit hitboxes. Tooltips sit under overlays (z 25) and hide while placing. Farm XP floats say "Farm". Rune Stone has a capture ring, glow, top-bar badge (`#r-relic`) and minimap diamond. How to Play is a five-step opening plus a key grid.
+- Difficulty: Warlord first army at 6:00 with the first wave capped at 3 units; Lord and Warlord start with 300 food.
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
