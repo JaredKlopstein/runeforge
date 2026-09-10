@@ -158,6 +158,15 @@ After terrain noise and the road, `genWorld` runs a thinning pass before nodes a
 - Perf: terrain lives in `R.chunks` (12-tile, 384 px canvases; `R.ctxFor(x,y)` returns a context pre-translated so `drawTile` keeps absolute coordinates); `render` draws only visible chunks. `R.sparks` precomputes water sparkle positions. `SH` uses a generation-stamped array of reusable buckets. `render` reuses `R.bldList` / `R.unitList`.
 - Process rule from the user: **after every roadmap phase, run the three Claude-in-Chrome playtesters** before moving on.
 
+## Round-seven fixes (after Phase A)
+
+- Top bar: `#wavepill`/`#armypill`/`#r-relic` ellipsize; under 1600 px the copy is short (`Inside! ×8`, `At walls ×8`, `Arriving 0:31 ×7`, `Next 6:34`, `✦ held/enemy`, age without the word "Age", clock hidden). `ai.compN` = wave size (fallback: count of enemy attack-movers); the full composition lives in the wave pill tooltip. `widetest.html` (git-ignored) is a 1440×720 iframe harness.
+- Leash: `u.leashX/Y` is a persistent home point. Idle scan sets it only when undefined or within 3 tiles; retaliation/response paths reuse it; `giveOrder`/`cmdMove` clear it; the idle scan clears it once the unit is back within 3 tiles. So chained auto-engagements can never drift more than 12 tiles from where the first one started.
+- Rune Stone: scouts don't count; `R.pend/R.pendT` require the new owner to hold for 4 s before `R.owner` flips.
+- `dropAuto(units,later)` sets `u.autoWas` when the drop came from placement (`tryPlace`, `placeWallLine`); `finishBuild` (no next foundation) and `buildStep` end restore `u.auto`. Manual orders reset `autoWas`.
+- Regen is one curve on the existing line in `updateUnit`: `0.25+0.03·cb` after 8 s, or `0.5+0.05·cb` after 6 s at Combat 10+.
+- Waves always take idle rams (`att.push` after the slice). Army pill's enemy estimate is at least the visible enemy soldier count. Exhausted rubble is a dark cross; the dropdown counts only explored veins; tooltip drops mining stats when exhausted. Unlock toasts are suppressed for 8 s after an attack and rate-limited to one per 2 s. Gather tick sound plays 1 in 3. `unitAt` radius 22 px. Music no longer stops in `enterPlay`. Panel tooltips refresh text and hide after 7 s. `placeWallLine` reports skipped tiles. End screen counts alive units; graph food is amber and the right axis has ticks.
+
 ## What's New screen
 
 `VERSION`, `CHANGELOG` (newest first: `{v,d,t,items[]}`) and `ROADMAP` (`{t,n,soon?}`) live just above `toggleSkills`. `showNews(fromGame)` renders `#news` (title button `#b-news`, pause-menu `#m-news`, hash `#news`), marks `runeforge_seen_ver`, and `refreshNewsDot` shows the cyan dot on the title button until the current version has been opened. **Bump `VERSION` and add a `CHANGELOG` entry with every user-visible change.**
