@@ -127,6 +127,15 @@ CSS block "Design system v2" at the end of the stylesheet overrides earlier rule
 - Tutorial on touch: `TUT_TOUCH[i]` replaces each step's text (no hotkeys); the card header toggles `#tutor.collapsed`, and on `body.short` screens it auto-collapses 9s after a step starts (`UI.tutCollapse`). Toasts (`#msg`) sit below the card / above the toolbar on phones.
 - Edge scrolling is off on touch. `mobiletest.html` (git-ignored) embeds the game in 844×390 and 390×700 frames for testing; frame-scoped `let` state must be read via `contentWindow.eval`.
 
+## Round-six fixes (Claude)
+
+- Walls: with the Palisade ghost live, mouse-drag draws an L-shaped line (`wallLineTiles`, `UI.wallLine`, `placeWallLine`); every foundation without an assigned villager claims the nearest free one (`claimBuilder`); after wall/gate placement `perimeterOpen()` (enemy-side A* to the player TC) drives a sealed/open toast. Farm builders keep Auto and the first builder works the finished farm.
+- Input: Esc always cancels placement/modes (also closes the dropdown), other hotkeys are ignored while a ghost is live, Patrol accepts left-click, `cycleIdle` matches the Idle count, dropdown "Send a villager" prefers idle → lowest current skill and names who moved, and explains skill-gated nodes.
+- Combat/HUD: Aggressive engage radius 9 tiles (idle 7); `ai.atWalls` needs contact with a wall/gate, `ai.inside` = within 9 tiles of the TC ("Enemy army inside your base!"); both reset when nothing marches; attack banner 6s; "Your army has been lost" when a ≥5 army hits zero (`G.milPeak`). Tutorial step 11 also requires Space or Z (`G.tutKeys`).
+- Balance: AI villager target from `DIFF.vil` (+2 Bronze, +4 later); home garrison capped at 1.5× wave size before Iron; Iron costs 200 stone; Tower is Bronze; start food 300/400/400; extra tier-0 rock cluster near each start.
+- UI: `G.gross` tracks gathered income (deposits, farms, relic) and the dropdown shows gathered vs spent; population copy fixed; Cancel-last is a permanent (locked when empty) tile; badges Q/Y/↵/Del; panel tooltips anchor above the panel; world tooltips auto-hide after 4s idle; dropdown is opaque and hides the tutorial card; new army pill (`#armypill`, dropdown `army`: yours / training / next wave / enemy seen / rally, actions select/train/home).
+- Mobile: `#tbs` wraps the pills (built at init) and scrolls under 600px with Menu fixed; touch targets 34/36/60px; `.k` badges and `.kbonly` rows hidden on touch; Skills in the pause menu; canvas touchstart closes dropdown/tooltips; selection card and minimap capped inside the panel; safe-area insets; no start toasts in the touch tutorial.
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
