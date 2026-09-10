@@ -136,10 +136,16 @@ CSS block "Design system v2" at the end of the stylesheet overrides earlier rule
 - UI: `G.gross` tracks gathered income (deposits, farms, relic) and the dropdown shows gathered vs spent; population copy fixed; Cancel-last is a permanent (locked when empty) tile; badges Q/Y/↵/Del; panel tooltips anchor above the panel; world tooltips auto-hide after 4s idle; dropdown is opaque and hides the tutorial card; new army pill (`#armypill`, dropdown `army`: yours / training / next wave / enemy seen / rally, actions select/train/home).
 - Mobile: `#tbs` wraps the pills (built at init) and scrolls under 600px with Menu fixed; touch targets 34/36/60px; `.k` badges and `.kbonly` rows hidden on touch; Skills in the pause menu; canvas touchstart closes dropdown/tooltips; selection card and minimap capped inside the panel; safe-area insets; no start toasts in the touch tutorial.
 
+## Start areas and placement safety
+
+- `STARTS` are (14,14) and (81,81); the guaranteed clearing is 11 tiles (water only beyond 13), the tier-0/1/2 patches sit on its rim, and a 2-wide grass corridor is carved from each start toward the map center on both axes (8–26 tiles out) so every base has at least two exits besides the road.
+- `sealRatio(type,tx,ty,team)` = reachable tiles after / before a hypothetical footprint. Player: refused below 0.75 (`wouldSeal`), orange "narrows your exit" hint below 0.9 on the ghost. AI `pickSpot` skips road tiles and any spot below 0.8; house/farm/forge anchors come from `aiRing(tc,rMin,rMax)`. `aiRescue()` (every 10s) demolishes the building whose removal most restores reach when the AI's reachable area falls under 350 tiles.
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
 - (done) Top bar: `nowrap` children, `#word` hidden under 1560px, buttons trimmed under 1400/1240px.
 - (done) Enemy fog: `G.exploredE` / `G.visibleE` are the AI's own maps, filled in `updateVision`. `aiSees(x,y)` / `aiKnows(x,y)` gate threat detection, wave targets (unknown TC → march to the player's start), and straggler targets. Saved as `exploredE`.
 - (done) Every right-click job in `issueCommand` goes through `giveOrder`. `updateUnit` pops the next queued order when `task` is null (before Auto re-picks). A gather with queued orders ends after one delivered load (`gatherStep` deposit) so `gather → build → gather` works.
+- Resource clusters are still large and can block movement (user request: thin them out next).
 - Playtests are run by three parallel Claude-in-Chrome subagents (first-timer / builder / rusher) in their own tabs with `?bg=1`; they cannot see each other's tabs.
