@@ -62,6 +62,13 @@ h3{margin:0 0 4px;font-family:var(--font-ui);font-size:16px;color:var(--gold2);f
 kbd{background:#3a2f1c;border:1px solid #8a6d3b;border-radius:3px;padding:0 5px;color:#f3d98a}
 #msg{position:absolute;left:50%;top:84px;transform:translateX(-50%);z-index:6;pointer-events:none;text-align:center;font-size:13px}
 #msg div{background:rgba(18,14,8,.9);border:1px solid #9c7b45;padding:4px 14px;margin-bottom:4px;border-radius:4px;color:#f3d98a;box-shadow:0 2px 8px rgba(0,0,0,.6)}
+#tutor{position:absolute;left:12px;top:52px;width:300px;z-index:6;background:linear-gradient(rgba(38,30,16,.95),rgba(20,14,8,.95));border:1px solid var(--gold);border-radius:5px;padding:9px 12px;font-size:12.5px;line-height:1.4;box-shadow:0 4px 16px rgba(0,0,0,.6);display:none}
+#tutor.show{display:block}
+#tutor .tt-head{display:flex;justify-content:space-between;align-items:center;color:var(--gold2);font-size:11px;letter-spacing:.08em;margin-bottom:4px}
+#tutor .tt-btns button{padding:1px 7px;font-size:11px;margin-left:4px}
+#tutor #tt-title{font-family:var(--font-ui);font-size:16px;color:var(--gold2);margin-bottom:3px}
+#tutor kbd{margin:0 1px}
+#tutor.done{border-color:#9fe27a;box-shadow:0 0 16px rgba(159,226,122,.35)}
 #alert{position:absolute;left:50%;top:50px;transform:translateX(-50%);z-index:7;pointer-events:none;background:rgba(120,20,10,.92);border:1px solid #ff7a5a;color:#ffe0d0;padding:5px 16px;border-radius:4px;font-size:13px;display:none;box-shadow:0 0 18px rgba(255,80,50,.5);animation:alertpulse 1s infinite}
 @keyframes alertpulse{50%{border-color:#ffd0c0}}
 #mode{position:absolute;left:50%;bottom:210px;transform:translateX(-50%);z-index:6;pointer-events:none;color:#9fff9a;font-size:13px;background:rgba(0,0,0,.65);border:1px solid rgba(125,255,122,.4);padding:3px 12px;border-radius:4px;display:none}
@@ -98,6 +105,7 @@ label.chk{display:flex;gap:8px;align-items:center;cursor:pointer}
  </div>
  <div class="boot-col">
   <button class="boot-btn" id="b-new">New Skirmish</button>
+  <button class="boot-btn" id="b-tutorial" data-tip="A guided first game: objectives complete as you play">Tutorial</button>
   <button class="boot-btn" id="b-continue" disabled>Continue</button>
   <button class="boot-btn" id="b-settings">Settings</button>
   <button class="boot-btn" id="b-howto">How to Play</button>
@@ -126,6 +134,7 @@ label.chk{display:flex;gap:8px;align-items:center;cursor:pointer}
 </div>
 <div id="msg"></div>
 <div id="mode"></div>
+<div id="tutor"><div class="tt-head"><span id="tt-prog">Tutorial 1/12</span><span class="tt-btns"><button id="tt-skip" data-tip="Skip this objective">Skip</button><button id="tt-exit" data-tip="Leave the tutorial and keep playing">Exit</button></span></div><div id="tt-title">Objective</div><div id="tt-text"></div></div>
 <div id="alert"><b>⚠ Under attack!</b> <span id="alert-where"></span> — press <kbd>Space</kbd> to jump there</div>
 <div id="panel">
  <div id="mmwrap"><canvas id="mm" width="180" height="180"></canvas></div>
@@ -600,7 +609,7 @@ function aiThink(){const team=G.teams[1],ai=G.ai;let threatNow=false;for(const u
  if(threat){for(const m of mil){if(!m.task||(m.task.kind==='move')||(m.task.kind==='attack'&&m.task.auto&&Math.hypot(m.x-threat.x,m.y-threat.y)>14*TS)){m.task={kind:'attack',target:threat.id,resume:null};m.path=null;m.flow=null}}
   for(const v of vil){if(v.task&&v.task.kind==='attack'&&Math.hypot(v.x-tcx,v.y-tcy)>16*TS){v.task=null}}}
  // --- waves ---
- if(G.time>=ai.nextWave){const ptc=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);const keep=threat?mil.length:Math.max(2,Math.ceil(mil.length/3));const att=mil.filter(m=>!m.task||m.task.kind==='move'||(m.task.kind==='attack'&&m.task.auto)).sort((a,b)=>a.lv.cb-b.lv.cb).slice(keep).slice(0,ai.wave===0?3:3+(ai.extra||0)+ai.wave+Math.floor(team.age*1.5));
+ if(G.time>=ai.nextWave){const ptc=G.blds.find(b=>b.team===0&&b.type==='tc'&&!b.dead);const keep=threat?mil.length:Math.max(2,Math.ceil(mil.length/3));const att=mil.filter(m=>!m.task||m.task.kind==='move'||(m.task.kind==='attack'&&m.task.auto)).sort((a,b)=>a.lv.cb-b.lv.cb).slice(keep).slice(0,ai.wave===0?(ai.soft?2:3):3+(ai.extra||0)+ai.wave+Math.floor(team.age*1.5)-(ai.soft?1:0));
   if(att.length>=3&&ptc){const counts={};for(const u of att)counts[u.type]=(counts[u.type]||0)+1;ai.comp='('+Object.entries(counts).map(([k,v])=>v+' '+UNIT_DEF[k].name+(v>1?'s':'')).join(', ')+')';const known=aiKnows(Math.floor(ptc.tx+ptc.w/2),Math.floor(ptc.ty+ptc.h/2));const sc=my.find(u=>u.type==='scout'&&!u.dead);if(!known&&sc&&ai.scoutWait<3){ai.scoutWait=(ai.scoutWait||0)+1;sc.task={kind:'move',x:STARTS[0].x*TS,y:STARTS[0].y*TS,tx:STARTS[0].x,ty:STARTS[0].y};sc.path=null;sc.flow=null;ai.nextWave=G.time+30;return}ai.scoutWait=0;const [gx,gy]=known?bldCenter(ptc):[STARTS[0].x*TS,STARTS[0].y*TS];cmdMove(att,gx,gy,true);ai.wave++;ai.marchArrive=G.time+waveTravel();ai.nextWave=G.time+Math.max(90,180-ai.wave*10)-(ai.extra||0)*20;showMsg('Scouts report an enemy army marching! '+ai.comp);SND.play(220,0.4,'sawtooth',0.05,-100);SND.play(165,0.6,'sawtooth',0.05,-60)}
   else ai.nextWave=G.time+25}
  if(G.relic&&!threat&&G.relic.owner!==1&&team.age>=1){const idle=mil.filter(m=>!m.task&&Math.hypot(m.x-STARTS[1].x*TS,m.y-STARTS[1].y*TS)<24*TS);if(idle.length>=5&&G.time-(ai.relicT||-99)>120){ai.relicT=G.time;cmdMove(idle.slice(0,3),G.relic.x*TS+16,G.relic.y*TS+16,true)}}
@@ -1013,7 +1022,7 @@ function showSettings(from){UI.settingsFrom=from||UI.screen;hideOvs();if(!UI.ing
 function closeSettings(){if(UI.settingsFrom==='pause'){hideOvs();$('menu').classList.add('show');UI.screen='pause'}else showTitle()}
 function openHowto(fromGame){hideOvs();$('bootui').style.display='none';$('tut').classList.add('show');if(fromGame){UI.screen='howto';if(G)G.paused=true}else{UI.screen='howto';$('bootui').style.display='none'}}
 function closeHowto(){if(UI.ingame){hideOvs();if(G&&!G.over)G.paused=false;UI.screen='game';try{localStorage.setItem('runeforge_tut','1')}catch(e){}}else showTitle()}
-function enterPlay(){UI.screen='game';UI.ingame=true;document.body.classList.add('play');hideOvs();$('bootui').style.display='none';if(G)G.paused=false;MUS.stop();last=performance.now()}
+function enterPlay(){UI.screen='game';UI.ingame=true;document.body.classList.add('play');hideOvs();$('bootui').style.display='none';if(G)G.paused=false;MUS.stop();last=performance.now();if(G&&G.tutorial)tutorShow();else $('tutor').classList.remove('show')}
 function paintDiff(){const box=$('lob-diff');box.innerHTML='';DIFF.forEach((d,i)=>{const b=document.createElement('button');b.textContent=d.name;if(i===CFG.diff)b.className='on';b.onclick=()=>{CFG.diff=i;saveCfg();paintDiff()};box.appendChild(b)});$('lob-diff-desc').textContent=DIFF[CFG.diff].desc}
 function paintLobbyMap(seed){const w=genWorld(seed||'rune');const c=$('lobmap').getContext('2d');c.imageSmoothingEnabled=false;const img=c.createImageData(N,N),d=img.data;
  for(let i=0;i<N*N;i++){const t=w.T[i];let col=[72,118,58];if(t===T_WATER)col=[46,107,149];else if(t===T_ROAD)col=[176,154,111];else if(t===T_FOREST)col=[37,90,40];else if(t===T_STONE)col=[150,155,160];else if(t===T_ORE)col=[200,120,60];d[i*4]=col[0];d[i*4+1]=col[1];d[i*4+2]=col[2];d[i*4+3]=255}
@@ -1021,6 +1030,23 @@ function paintLobbyMap(seed){const w=genWorld(seed||'rune');const c=$('lobmap').
  c.fillStyle='#8fd0ff';c.fillRect(STARTS[0].x/N*240-4,STARTS[0].y/N*240-4,10,10);c.fillStyle='#ff7a6a';c.fillRect(STARTS[1].x/N*240-4,STARTS[1].y/N*240-4,10,10)}
 function syncSettings(){$('s-mute').checked=CFG.mute;$('s-music').value=Math.round(CFG.music*100);$('s-sfx').value=Math.round(CFG.sfx*100);$('s-music-v').textContent=Math.round(CFG.music*100)+'%';$('s-sfx-v').textContent=Math.round(CFG.sfx*100)+'%';$('s-edge').checked=CFG.edge;$('s-tut').checked=CFG.tut}
 function applySettings(){CFG.mute=$('s-mute').checked;CFG.music=($('s-music').value|0)/100;CFG.sfx=($('s-sfx').value|0)/100;CFG.edge=$('s-edge').checked;CFG.tut=$('s-tut').checked;saveCfg();syncSettings();MUS.setVol();if(CFG.mute)MUS.stop()}
+const TUT_STEPS=[
+ {title:'Meet your villagers',text:'Drag a box around the four villagers below the Town Center (or click one). Selected units show a green ring and appear in the bottom panel.',done:()=>UI.sel.some(id=>{const u=G.byId.get(id);return u&&u.kind==='u'&&u.type==='villager'})},
+ {title:'Chop wood',text:'With villagers selected, <b>right-click a tree</b>. They walk over, swing, and haul wood back. Every swing earns Woodcutting XP.',done:()=>G.units.some(u=>u.team===0&&u.type==='villager'&&u.task&&u.task.kind==='gather'&&u.task.node>=0&&G.nodes[u.task.node].type==='wood')},
+ {title:'Catch fish',text:'Send at least one villager to the pond: right-click a fish. Food trains everything, so never let it run dry.',done:()=>G.units.some(u=>u.team===0&&u.type==='villager'&&u.task&&u.task.kind==='gather'&&u.task.node>=0&&G.nodes[u.task.node].type==='food')},
+ {title:'Build a House',text:'Select a villager, press <kbd>H</kbd>, and click open grass near the Town Center. Red tiles in the ghost block placement. Each House adds 5 population.',done:()=>G.blds.some(b=>b.team===0&&b.type==='house')},
+ {title:'Train villagers',text:'Click the Town Center and press <kbd>V</kbd> twice. New villagers start on <b>Auto</b>: they pick jobs themselves. Press <kbd>.</kbd> any time to find an idle villager.',done:()=>{const tc=G.blds.find(b=>b.team===0&&b.type==='tc');return (tc&&tc.queue.length>=1)||G.units.filter(u=>u.team===0&&u.type==='villager').length>=6}},
+ {title:'Turn on Auto',text:'Select your original villagers and press <kbd>C</kbd>. Auto villagers gather what you are short on, help build, repair, and run into the Town Center when raiders come.',done:()=>G.units.filter(u=>u.team===0&&u.type==='villager'&&u.auto).length>=4},
+ {title:'Sow a Farm',text:'Press <kbd>J</kbd> to place a Farm, then right-click it with a villager. Farms feed you forever once the fish are gone.',done:()=>G.units.some(u=>u.team===0&&u.task&&u.task.kind==='farm')},
+ {title:'Raise a Barracks',text:'Press <kbd>B</kbd> with villagers selected and place it inside your base. It trains Scouts, Guards and later siege.',done:()=>G.blds.some(b=>b.team===0&&b.type==='barracks'&&b.built)},
+ {title:'Send a Scout',text:'Select the Barracks and press <kbd>N</kbd>. Scouts explore on their own and report enemy buildings. Watch the minimap fill in.',done:()=>G.units.some(u=>u.team===0&&u.type==='scout')},
+ {title:'Muster Guards',text:'Press <kbd>G</kbd> at the Barracks until you have three Guards. The top bar counts down to the enemy army; Guards near your base fight on their own.',done:()=>G.units.filter(u=>u.team===0&&u.type==='guard').length>=3},
+ {title:'Hold the line',text:'A small raiding party is on its way. Press <kbd>Space</kbd> to jump to any attack. Select your Guards, press <kbd>Z</kbd> and click near the raiders to attack-move. Villagers will garrison in the Town Center by themselves.',done:()=>G.stats&&G.stats.killed>=1,onStart:()=>{G.ai.nextWave=Math.min(G.ai.nextWave,G.time+40)}},
+ {title:'Advance to the Iron Age',text:'Click the Town Center. When you have 350 wood, 250 stone and 200 food and your six best units average skill 8, press <b>Advance to Iron</b>. Iron unlocks Rangers, Rams, Towers and the Forge. After that: level up, upgrade buildings with <kbd>U</kbd>, and raze the enemy Town Center in the south-east.',done:()=>G.teams[0].age>=1}];
+function startTutorial(){CFG.diff=0;newGame('tutor');G.tutorial={i:0,shown:-1,t:0};G.ai.nextWave=600;G.ai.targetVil=6;G.ai.soft=true;for(const u of G.units)if(u.team===0)u.auto=false;enterPlay();showMsg('Tutorial: follow the objectives in the top-left card');tutorShow()}
+function tutorShow(){const el=$('tutor');const T=G&&G.tutorial;if(!T||T.i>=TUT_STEPS.length){el.classList.remove('show');return}const st=TUT_STEPS[T.i];el.classList.add('show');el.classList.remove('done');$('tt-prog').textContent='Tutorial '+(T.i+1)+'/'+TUT_STEPS.length;$('tt-title').textContent=st.title;$('tt-text').innerHTML=st.text;if(T.shown!==T.i){T.shown=T.i;if(st.onStart)st.onStart()}}
+function tutorAdvance(skip){const T=G&&G.tutorial;if(!T)return;T.i++;if(T.i<TUT_STEPS.length){const st=TUT_STEPS[T.i];T.shown=T.i;if(st.onStart)try{st.onStart()}catch(e){}}if(T.i>=TUT_STEPS.length){$('tutor').classList.remove('show');showMsg('Tutorial complete — the rest is war. Good luck!');SND.play(523,0.2,'triangle',0.06);setTimeout(()=>SND.play(784,0.4,'triangle',0.06),180);G.tutorial=null;return}if(!skip){$('tutor').classList.add('done');SND.play(660,0.12,'triangle',0.05,300);setTimeout(()=>{if(G&&G.tutorial)tutorShow()},700)}else tutorShow()}
+function tutorTick(dt){const T=G.tutorial;if(!T||T.i>=TUT_STEPS.length)return;T.t+=dt;if(T.t<0.3)return;T.t=0;let ok=false;try{ok=!!TUT_STEPS[T.i].done()}catch(e){ok=false}if(ok)tutorAdvance(false)}
 function startSkirmish(seed){newGame(seed||'rune');enterPlay();if(CFG.tut){try{if(localStorage.getItem('runeforge_tut')==='1'&&!location.search.includes('tutorial'))return}catch(e){}openHowto(true)}}
 function continueSave(){try{const t=localStorage.getItem(SAVE_KEY);if(!t)return;loadGame(t);enterPlay()}catch(e){showTitle()}}
 function autosave(){if(!G||G.over||!UI.ingame)return;try{localStorage.setItem(SAVE_KEY,saveGame());localStorage.setItem(SAVE_KEY+'_meta',JSON.stringify({seed:G.seed,time:G.time,age:G.teams[0].age,diff:CFG.diff}))}catch(e){}}
@@ -1073,7 +1099,7 @@ function bindInput(){
  $('m-save').onclick=()=>{$('savetxt').value=saveGame();autosave();$('m-note').textContent='Save text generated ('+$('savetxt').value.length+' chars). Also written to this browser.'};
  $('m-load').onclick=()=>{try{loadGame($('savetxt').value);$('m-note').textContent='Loaded.';$('menu').classList.remove('show');UI.screen='game';G.paused=false}catch(err){$('m-note').textContent='Load failed: '+err.message}};
  $('m-copy').onclick=()=>{$('savetxt').select();try{document.execCommand('copy');if(navigator.clipboard)navigator.clipboard.writeText($('savetxt').value)}catch(e){}$('m-note').textContent='Copied to clipboard.'};
- $('b-new').onclick=()=>{SND.init();MUS.start();showLobby()};$('b-continue').onclick=()=>{SND.init();continueSave()};$('b-settings').onclick=()=>{SND.init();MUS.start();showSettings('title')};$('b-howto').onclick=()=>{SND.init();MUS.start();openHowto(false)};
+ $('b-new').onclick=()=>{SND.init();MUS.start();showLobby()};$('b-tutorial').onclick=()=>{SND.init();startTutorial()};$('tt-skip').onclick=()=>tutorAdvance(true);$('tt-exit').onclick=()=>{if(G){G.tutorial=null;$('tutor').classList.remove('show');showMsg('Tutorial ended — keep playing')}};$('b-continue').onclick=()=>{SND.init();continueSave()};$('b-settings').onclick=()=>{SND.init();MUS.start();showSettings('title')};$('b-howto').onclick=()=>{SND.init();MUS.start();openHowto(false)};
  $('lob-back').onclick=showTitle;$('lob-go').onclick=()=>startSkirmish($('lobseed').value||'rune');$('lob-rand').onclick=()=>{const s=Math.random().toString(36).slice(2,8);$('lobseed').value=s;paintLobbyMap(s)};
  $('lobseed').addEventListener('input',()=>paintLobbyMap($('lobseed').value||'rune'));
  $('s-back').onclick=closeSettings;
@@ -1111,7 +1137,7 @@ function endGame(kind){if(G.over)return;G.over=kind;const m=Math.floor(G.time/60
  const st=G.stats||{};const stats=' Time '+m+':'+String(s).padStart(2,'0')+' · Age: '+AGES[G.teams[0].age].name+' · Avg skill '+avgSkill(0).toFixed(1)+' · Units '+popUsed(0)+' · Kills '+ (st.killed||0)+' · Lost '+(st.lost||0)+' · Built '+(st.built||0);
  $('end-text').textContent=(kind==='win'?'The enemy Town Center lies in ruins.':'Your Town Center has fallen.')+stats;$('end').classList.add('show');
  if(kind==='win'){SND.play(523,0.3,'triangle',0.06);setTimeout(()=>SND.play(659,0.3,'triangle',0.06),200);setTimeout(()=>SND.play(784,0.5,'triangle',0.06),400)}else{SND.play(200,0.6,'sawtooth',0.06,-120)}}
-function update(dt){G.time+=dt;PC.budget=12;SND.n=0;SH.build();G.popUsed=[popUsed(0),popUsed(1)];
+function update(dt){G.time+=dt;PC.budget=12;SND.n=0;SH.build();G.popUsed=[popUsed(0),popUsed(1)];if(G.tutorial)tutorTick(dt);
  for(let t=0;t<2;t++){const team=G.teams[t];if(team.adv>0){team.adv-=dt;if(team.adv<=0){team.adv=0;team.age++;UI.lastSelKey='';if(t===0){showMsg('Welcome to the '+AGES[team.age].name+' Age! Gear upgraded for every unit.');SND.play(392,0.2,'triangle',0.06);setTimeout(()=>SND.play(587,0.4,'triangle',0.06),180)}else showMsg('The enemy has reached the '+AGES[team.age].name+' Age')}}}
  for(const b of G.blds)updateBld(b,dt);
  for(const u of G.units)if(!u.dead)updateUnit(u,dt);
@@ -1127,7 +1153,7 @@ function update(dt){G.time+=dt;PC.budget=12;SND.n=0;SH.build();G.popUsed=[popUse
  if(G.time-(G.saveT||0)>30){G.saveT=G.time;autosave()}}
 function packBits(a){let s='';for(let i=0;i<a.length;i+=8){let v=0;for(let k=0;k<8;k++)if(a[i+k])v|=1<<k;s+=String.fromCharCode(v)}return btoa(s)}
 function unpackBits(str,a){const s=atob(str);for(let i=0;i<s.length;i++){const v=s.charCodeAt(i);for(let k=0;k<8;k++)if(i*8+k<a.length)a[i*8+k]=(v>>k)&1}}
-function saveGame(){const st={v:1,diff:CFG.diff,seed:G.seed,time:G.time,ct:G.ct,nextId:G.nextId,teams:G.teams,ai:G.ai,speed:G.speed,over:G.over,
+function saveGame(){const st={v:1,diff:CFG.diff,tutorial:G.tutorial?{i:G.tutorial.i}:null,seed:G.seed,time:G.time,ct:G.ct,nextId:G.nextId,teams:G.teams,ai:G.ai,speed:G.speed,over:G.over,
  units:G.units.filter(u=>!u.dead).map(u=>({id:u.id,team:u.team,type:u.type,x:Math.round(u.x),y:Math.round(u.y),hp:u.hp,skills:u.skills,task:u.task,carry:u.carry,carryAmt:u.carryAmt,acool:u.acool,auto:u.auto,inside:u.inside||0,manualG:!!u.manualG})),
  blds:G.blds.filter(b=>!b.dead).map(b=>({id:b.id,team:b.team,type:b.type,tx:b.tx,ty:b.ty,hp:b.hp,built:b.built,prog:b.prog,queue:b.queue,rally:b.rally,tier:b.tier,upg:b.upg,open:b.open})),
  nodes:G.nodes.map(n=>[n.amt,Math.round(n.regrow)]),explored:packBits(G.explored),exploredE:packBits(G.exploredE),cam:{x:cam.x,y:cam.y,z:cam.z},groups:UI.groups};
@@ -1139,7 +1165,7 @@ function loadGame(txt){const st=JSON.parse(txt);if(!st||st.v!==1||typeof st.seed
  for(const u of st.units){G.nextId=u.id;const nu=mkUnit(u.team,u.type,u.x,u.y);nu.skills=Object.assign(nu.skills,u.skills||{});for(const s of SKILLS)nu.lv[s]=lvlOf(nu.skills[s]);nu.maxhp=UNIT_DEF[u.type].hp+(u.type==='villager'?0:nu.lv.cb*2);nu.hp=Math.min(u.hp,nu.maxhp);nu.task=u.task||null;nu.carry=u.carry||null;nu.carryAmt=u.carryAmt||0;nu.acool=u.acool||0;nu.auto=!!u.auto;nu.inside=u.inside||0;nu.manualG=!!u.manualG;
   if(nu.task&&(nu.task.kind==='move'||nu.task.kind==='attackmove')&&nu.task.tx!==undefined){nu.flow=null}}
  G.nextId=Math.max(st.nextId||1,G.nextId+1);for(let i=0;i<G.nodes.length&&i<st.nodes.length;i++){const n=G.nodes[i];n.amt=st.nodes[i][0];n.regrow=st.nodes[i][1];if(n.amt<=0)R.redrawTile(n.x,n.y)}
- if(st.explored)unpackBits(st.explored,G.explored);if(st.exploredE)unpackBits(st.exploredE,G.exploredE);UI.groups=st.groups||{};if(st.cam){cam.x=st.cam.x;cam.y=st.cam.y;cam.z=st.cam.z;clampCam()}
+ if(st.tutorial&&typeof st.tutorial.i==='number')G.tutorial={i:st.tutorial.i,shown:st.tutorial.i,t:0};if(st.explored)unpackBits(st.explored,G.explored);if(st.exploredE)unpackBits(st.exploredE,G.exploredE);UI.groups=st.groups||{};if(st.cam){cam.x=st.cam.x;cam.y=st.cam.y;cam.z=st.cam.z;clampCam()}
  G.popUsed=[popUsed(0),popUsed(1)];invalidatePaths();updateVision();R.buildMini();for(const n of G.nodes)if(n.amt<=0)R.redrawTile(n.x,n.y);setSel([],false);renderMini();showMsg('Game loaded')}
 let last=performance.now(),lastFrameAt=performance.now(),rafPending=false;
 const BG=location.search.includes('bg=1');
@@ -1153,7 +1179,7 @@ function frame(now){rafPending=false;lastFrameAt=now;if(!(BG&&document.hidden))s
   ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;try{render()}catch(e){ctx.setTransform(1,0,0,1,0,0);console.error(e)}G.mmT-=dt;if(G.mmT<=0){G.mmT=0.3;renderMini()}
   const spent=performance.now()-t0;if(spent>50)console.warn('slow frame',spent.toFixed(1)+'ms')}}
 initIcons();resize();bindInput();showTitle();
-{const h=(location.hash||'').slice(1);if(h==='lobby')showLobby();else if(h==='settings')showSettings('title');else if(h==='howto')openHowto(false);else if(h==='play'){CFG.tut=false;startSkirmish('rune')}}
+{const h=(location.hash||'').slice(1);if(h==='lobby')showLobby();else if(h==='settings')showSettings('title');else if(h==='howto')openHowto(false);else if(h==='play'){CFG.tut=false;startSkirmish('rune')}else if(h==='tutorial'){startTutorial()}}
 if(BG){const mk=()=>{try{const w=new Worker(URL.createObjectURL(new Blob(['setInterval(()=>postMessage(0),33)'],{type:'text/javascript'})));w.onmessage=()=>{if(document.hidden)frame(performance.now())};return w}catch(e){return null}};let w=mk();setInterval(()=>{if(performance.now()-lastFrameAt>2000){if(w)w.terminate();w=mk();frame(performance.now())}},1000)}
 document.addEventListener('visibilitychange',()=>{if(BG){if(!document.hidden){last=performance.now();schedule()}return}
  if(!UI.ingame||!G){if(!document.hidden){last=performance.now();schedule()}return}

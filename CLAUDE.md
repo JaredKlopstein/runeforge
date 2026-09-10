@@ -97,6 +97,10 @@ If `!UI.ingame`, only `renderBoot`. Else update + `render`. Worker (`bg=1`) call
 - Stances are two lit buttons (`stance:aggro` / `stance:hold`). Box-select uses unit hitboxes. Tooltips sit under overlays (z 25) and hide while placing. Farm XP floats say "Farm". Rune Stone has a capture ring, glow, top-bar badge (`#r-relic`) and minimap diamond. How to Play is a five-step opening plus a key grid.
 - Difficulty: Warlord first army at 6:00 with the first wave capped at 3 units; Lord and Warlord start with 300 food.
 
+## Tutorial mode
+
+Title → **Tutorial** (or `#tutorial`). `startTutorial()` starts a Squire game on seed `tutor` with the starting villagers Auto OFF, first army at 10:00, `ai.soft` (first wave 2 units, later waves one smaller), and `G.tutorial={i,shown,t}`. `TUT_STEPS` is an ordered list of `{title,text,done(),onStart?}`; `tutorTick` (called from `update`) checks `done()` every 0.3s and advances with a flash on the `#tutor` card. Skip / Exit buttons on the card. Step 11's `onStart` pulls the next wave to +40s. The step index is saved (`st.tutorial`) and restored on Continue.
+
 ## Suggested next (not done)
 
 - Playtest farms / rams / gates / scouts in a real match (Chrome playtesters were Claude-in-Chrome; not re-run here).
