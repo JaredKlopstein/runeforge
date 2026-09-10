@@ -28,7 +28,7 @@ Constraints stay as in CLAUDE.md: one HTML file, procedural art/audio, `PASS_TEA
 
 Each phase is one or two sessions of work and ships as its own version. Order is by value per unit of effort, with cheap fixes first so each session ends deployed.
 
-### Phase A — v0.9.4 "Polish and fixes" (small, do first)
+### Phase A — v0.9.4 "Polish and fixes" — SHIPPED 2026-09-10 (hotkey left contextual: G trains Guards when a Barracks is selected, else places Forge)
 1. Data fixes: guard/forge hotkey collision (move Forge to `F`... check `farm` is `J`; pick a free letter), tower desc, remove dead `tc` cost, implement Combat 10 regen (out-of-combat `hp += dt*(0.5+lv.cb*0.05)` in `updateUnit` when `u.lastHit` older than 6 s; add `u.lastHit` in the hit path, L765).
 2. Lobby preview marks both keeps, the road and the Rune Stone (`paintLobbyMap` L1312).
 3. End screen: score (kills×, buildings×, age×, skills×), per-resource gathered from `G.stats`, and a small canvas graph of stock over time from `G.hist` (extend the ring to the whole match at 5 s samples, ~360 entries).
@@ -68,6 +68,7 @@ Each phase is one or two sessions of work and ships as its own version. Order is
 Phases A through D shipped, three playtest rounds clean, mobile verified on a real phone, README screenshots. Then tag `v1.0.0`.
 
 ## Verification pattern per phase
+- After every phase, run the three Claude-in-Chrome playtesters (first-timer / builder / rusher) and fix what they find before starting the next phase (user rule).
 - `node --check` on the extracted script after every patch.
 - Headless world-gen harness (`/tmp/wt.js` pattern) for map changes: component sizes, reach between starts, relic reachability.
 - Chrome on `http://jared-mini:8765/index.html?v=<stamp>&tester=<name>#play`; scripted `update(1/30)` loops for sim checks; screenshots for art passes; `mobiletest.html` for phone layouts.

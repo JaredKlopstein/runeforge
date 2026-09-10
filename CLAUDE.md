@@ -149,6 +149,15 @@ After terrain noise and the road, `genWorld` runs a thinning pass before nodes a
 
 `depleteNode(n,def,team)` runs whenever a node hits 0. `exhaustible(n)` is stone/ore with `tier<3`. `n.dep` counts depletions; `EXHAUST_P=[0,0,0.3,0.6,1]` indexed by `dep` gives the chance the vein ends for good, decided by a hash of node index, `dep` and `G.seedNum` (deterministic per seed). Exhausted nodes get `n.ex=true`, `regrow=0`, stay `amt=0` (so `pass` and `findNode` already treat them as gone), draw as 55%-alpha rubble, tooltip "Exhausted for good"; the owner sees a toast plus an "Exhausted" float when the tile is visible. Stone/Ore dropdowns show "N ran dry · M low-tier left". Saves store `[amt, regrow, dep, ex]` per node (older 2-field rows load fine). Wood, fish and tier 3–4 veins are always renewable. Low-tier stone/ore `amt` was raised ~15% to compensate.
 
+## Phase A polish (v0.9.4)
+
+- Combat 10 regen is real: `updateUnit` heals `0.5+0.05*cb` HP/s when not garrisoned and `G.time-u.lastHit>6` (`lastHit` is set in `attack`).
+- `G.hist5` samples every 5 s for the whole match (`{t,w,s,o,f,m,e}`, capped at 1440 = 2 h) and is saved with the game; `drawEndGraph` plots it on `#end-graph`. `endGame` shows a score (kills×10 + built×5 + age×200 + avgSkill×20 + gathered÷20 + win speed bonus) and a `#end-grid` of totals from `G.gross`.
+- `paintLobbyMap` overlays keeps 1/2, a Rune Stone diamond at the map centre and a legend strip.
+- Audio: `setSel` plays a per-type acknowledgement for own entities; tower shots, Rune Stone captured/lost, and every `<button>` click have sounds; `MUS.battle` is a filtered 55 Hz sawtooth layer that `MUS.setBattle(on)` fades in while `G.alert` is under 10 s old or the AI is `inside`/`atWalls` (checked once per second in `update`).
+- Perf: terrain lives in `R.chunks` (12-tile, 384 px canvases; `R.ctxFor(x,y)` returns a context pre-translated so `drawTile` keeps absolute coordinates); `render` draws only visible chunks. `R.sparks` precomputes water sparkle positions. `SH` uses a generation-stamped array of reusable buckets. `render` reuses `R.bldList` / `R.unitList`.
+- Process rule from the user: **after every roadmap phase, run the three Claude-in-Chrome playtesters** before moving on.
+
 ## What's New screen
 
 `VERSION`, `CHANGELOG` (newest first: `{v,d,t,items[]}`) and `ROADMAP` (`{t,n,soon?}`) live just above `toggleSkills`. `showNews(fromGame)` renders `#news` (title button `#b-news`, pause-menu `#m-news`, hash `#news`), marks `runeforge_seen_ver`, and `refreshNewsDot` shows the cyan dot on the title button until the current version has been opened. **Bump `VERSION` and add a `CHANGELOG` entry with every user-visible change.**
