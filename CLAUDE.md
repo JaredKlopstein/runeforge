@@ -206,6 +206,13 @@ After terrain noise and the road, `genWorld` runs a thinning pass before nodes a
 - **Saves**: pause menu `#slots` (3 slots, keys `SAVE_KEY+'_s'+n` + `_meta` with `at`), `paintSlots()` on open; Download file (Blob) and Load file (FileReader). Save body carries `map`, `vic`, `wonder`, `relicHold`.
 - **Tech tree**: `techHtml()` from `AGES/BLD_DEF/UPG/UNIT_DEF/UNLOCKS/PERKS`; `#tech` via pause-menu `#m-tech`, Esc closes. `unitStatLine(t)` is shared by train-button tooltips and unit hover tooltips.
 
+## Round-ten fixes (after Phase D, v0.11.1)
+
+- Hold stance: a separate idle scan (`stance==='hold'`) attacks enemies within `range+0.8` tiles with `task.holdFire`; the attack case drops the task if the target leaves that reach, so hold units never move.
+- Relic mode: contested decay is 0.5/s (was 2/s); the pill reads "contested (yours/enemy) m:ss/6:00" from the leader's counter; lobby copy says progress fades; the start toast names the objective per `G.vic`.
+- AI: `milCap` Iron `8+wave+2·extra`, Rune `12+2·wave+3·extra`; repairs its TC from 85% (others 60%); learns a finished player Wonder's tiles (`exploredE`) and pulls its next wave to ≤45 s; rams excluded from retaliation.
+- Idle→Auto waits 45 s after the last manual order (`u.manualT` set in `dropAuto`). Settings hotkey block is a two-column row with Reset under the grid; Esc inside a key box closes Settings. Age dropdown header shows "· next: X". Tech tree lists TC (with its upgrades) and Wonder always. Train tooltips show the Drill Yards time. Save body carries `stats` and `milPeak`; slot meta carries `map`/`vic`. `#r-wonder` is "⌛ m:ss" under 1600 px.
+
 ## What's New screen
 
 `VERSION`, `CHANGELOG` (newest first: `{v,d,t,items[]}`) and `ROADMAP` (`{t,n,soon?}`) live just above `toggleSkills`. `showNews(fromGame)` renders `#news` (title button `#b-news`, pause-menu `#m-news`, hash `#news`), marks `runeforge_seen_ver`, and `refreshNewsDot` shows the cyan dot on the title button until the current version has been opened. **Bump `VERSION` and add a `CHANGELOG` entry with every user-visible change.**
