@@ -188,6 +188,15 @@ After terrain noise and the road, `genWorld` runs a thinning pass before nodes a
 - AI palisade ring: at Iron with wood >220 and fewer than 3 pending builds, `ai.ring` plans a 9-tile square around the TC; road tiles become gates (or two gates toward the player if no road crosses); each think places up to 2 gates then up to 5 walls, skipping tiles with `sealRatio(...,1)<0.8`; `ai.ringDone` when the plan is exhausted.
 - AI retreat: `ai.waveHp0`/`ai.compN0` recorded at launch; if the marching wave's HP falls under 40% before it is `inside`, everyone walks home (`waveId` cleared), the player gets "The enemy army is retreating!" if any of their soldiers is visible to the AI, and the next wave is pulled to ≤75 s away.
 
+## Round-nine fixes (after Phase C, v0.10.1)
+
+- Repair (`buildStep` repair branch) heals `maxhp/(time*2.5)` per villager-second (TC ≈ 10 HP/s, was ≈ 60) and does nothing while `G.time-b.lastHit<10` (`attack` now stamps `lastHit` on buildings too; note "Cannot repair under fire").
+- Rams on attack-move scan only enemy buildings (7 tiles); they never chase units.
+- A team-0 villager with Auto off, no task and no orders for 20 s (`u.idleT`) is put back on Auto with a toast (30 s cooldown). This is the safety net behind every "builder went idle" report.
+- AI: `milCap` = Bronze `4+2·extra+2·min(wave,3)`, Iron `10+2·wave+3·extra`, Rune none (counts queued units); villager target gets +2 only from Iron and +4 from Rune; wave spacing floor `130-20·extra` s. Retreat no longer requires the wave to be outside the player's base.
+- Spearman 82 HP / def 9 / 35 food, ×0.85 vs guards. Plurals: names ending in "man" → "men". Unlock toasts once per skill level (`G.unlockSeen`). Key grid lists Y.
+- Canvas context loss: `contextrestored` on `#c` clears `ICON_CACHE`, re-runs `R.init()` (terrain chunks), redraws depleted tiles, `updateVision`, repaints icons and the panel; `visibilitychange` synthesises the event if `ctx.isContextLost()`.
+
 ## What's New screen
 
 `VERSION`, `CHANGELOG` (newest first: `{v,d,t,items[]}`) and `ROADMAP` (`{t,n,soon?}`) live just above `toggleSkills`. `showNews(fromGame)` renders `#news` (title button `#b-news`, pause-menu `#m-news`, hash `#news`), marks `runeforge_seen_ver`, and `refreshNewsDot` shows the cyan dot on the title button until the current version has been opened. **Bump `VERSION` and add a `CHANGELOG` entry with every user-visible change.**
