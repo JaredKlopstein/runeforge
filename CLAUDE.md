@@ -180,6 +180,14 @@ After terrain noise and the road, `genWorld` runs a thinning pass before nodes a
 - Idle count matches `cycleIdle` (includes stopped move tasks). Idle-scan soldiers with a leash more than 3 tiles away walk back to it. Rune Stone toasts have a 45 s cooldown (`R.msgT`). `#mode` is pointer-events none except its button. `,` skips scouts. C with no villagers selected explains itself. Let out is a permanent locked/unlocked TC slot.
 - Gear contrast: capes are 20 px wide with a light edge, breastplates are filled ellipses with a highlight, the Arms glint is a pulsing 4-point star. Card line: villagers "bronze tools, hood"; soldiers "plume, pauldrons" etc. End graph: ore `#c9603a`, food `#ffd166`.
 
+## Phase C: counters and a smarter enemy (v0.10.0)
+
+- `UNIT_DEF.spear` (Spearman, Bronze, 40f/30w, key Y at a Barracks; Y otherwise keeps its old meaning). Damage modifiers in `attack`: spear ×1.6 vs knight, ×1.4 vs ram, ×0.7 vs guard; tower ×1.5 and guard ×1.2 vs ram. Sprite = guard body, long spear with leaf head, buckler; icon `case 'spear'`; included in the armour-bracket and card-line type lists. Barracks tier-1 upgrade renamed **Drill Hall** (was "Garrison", which clashed with the villager Garrison tile).
+- AI army: trains spears when it can see player knights (up to 40% of its army), alternates guard/spear in Bronze (every third unit), guard/spear/ranger in Iron.
+- AI villagers flee to their own TC like Auto player villagers (`u.auto||u.team===1`, TC looked up by `u.team`; scouts don't trigger it).
+- AI palisade ring: at Iron with wood >220 and fewer than 3 pending builds, `ai.ring` plans a 9-tile square around the TC; road tiles become gates (or two gates toward the player if no road crosses); each think places up to 2 gates then up to 5 walls, skipping tiles with `sealRatio(...,1)<0.8`; `ai.ringDone` when the plan is exhausted.
+- AI retreat: `ai.waveHp0`/`ai.compN0` recorded at launch; if the marching wave's HP falls under 40% before it is `inside`, everyone walks home (`waveId` cleared), the player gets "The enemy army is retreating!" if any of their soldiers is visible to the AI, and the next wave is pulled to ≤75 s away.
+
 ## What's New screen
 
 `VERSION`, `CHANGELOG` (newest first: `{v,d,t,items[]}`) and `ROADMAP` (`{t,n,soon?}`) live just above `toggleSkills`. `showNews(fromGame)` renders `#news` (title button `#b-news`, pause-menu `#m-news`, hash `#news`), marks `runeforge_seen_ver`, and `refreshNewsDot` shows the cyan dot on the title button until the current version has been opened. **Bump `VERSION` and add a `CHANGELOG` entry with every user-visible change.**

@@ -42,7 +42,7 @@ Each phase is one or two sessions of work and ships as its own version. Order is
 4. Selection card portraits (`drawCmdIcon`/`iconImg`) pick up the same brackets so card and sprite agree.
 5. Skills overlay: add "next milestone" line per skill and a per-villager best-skill badge in the selection card.
 
-### Phase C — "Counters and a smarter enemy" (next; v0.9.7 was the round-eight fixes)
+### Phase C — "Counters and a smarter enemy" — SHIPPED as v0.10.0 on 2026-09-11 (Warlord+ tier deferred until the new AI tricks are playtested)
 1. New Bronze unit: **Spearman** (barracks, age 1, 40f/30w): 1.6× vs knight/cavalry, 0.7× vs guard; slow. Gives Knights a counter and Bronze a decision. Add to `UNIT_DEF`, `drawUnit`, `drawCmdIcon`, tooltips, AI wave comp.
 2. Ram counter: towers get 1.5× vs rams; guards 1.2× vs rams. AI builds rams when it has seen walls (`b._spotted` type wall/gate) and targets the nearest wall segment via `siegeFallback`.
 3. AI upgrades: builds a palisade ring with one gate at Iron (`placeWallLine` exists; add a ring helper around `aiRing`), garrisons villagers on raid (drop the `team===0` guard at L717 with a per-team cooldown), retreats a wave that falls under 40% strength to its TC, uses Aggressive stance on waves and Hold on tower guards.
