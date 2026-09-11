@@ -56,7 +56,7 @@ Each phase is one or two sessions of work and ships as its own version. Order is
 5. Settings: scroll speed, UI scale, colorblind team colors (swap `TEAM_COL` to an orange/blue pair), autosave toggle, hotkey rebind for the ten most-used keys (`KEYS` map read by `bindInput`).
 6. Named save slots (3) with timestamps in the pause menu, plus file download/upload via Blob for desktop.
 
-### Phase E — v0.10 "Heroes and campaign feel"
+### Phase E — "Heroes and campaign feel" — SHIPPED as v0.12.0 on 2026-09-11
 1. Hero villagers: at match start each team gets one named villager with a signature skill (+25% XP in it), a portrait, and a milestone cape. Hero death is a toast, not a loss. Names from a seeded list.
 2. Objectives panel for skirmish (not just tutorial): three rotating short goals (reach Mining 10, hold the relic 60 s, kill 5 units) that grant a small XP bonus; keeps solo matches feeling directed.
 3. Replay recording: every player command goes through one `issueCommand`/`giveOrder` entry point already; log `{t, cmd}` to `G.replay`, save with the game, and add a "Watch replay" mode that replays commands with input disabled. This requires the sim to be deterministic: audit `Math.random` uses in sim code (particles are fine, combat/AI must use `G.rng`). This is the groundwork for multiplayer and the biggest engineering item; do after D so the command surface has settled.
